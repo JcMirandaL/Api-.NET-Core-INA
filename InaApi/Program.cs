@@ -10,7 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 //defino las inyeccion de dependencias
 builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
-
+builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 
 
 builder.Services.AddControllers();

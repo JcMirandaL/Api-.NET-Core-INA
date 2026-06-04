@@ -8,16 +8,17 @@ using System.Threading.Tasks;
 
 namespace InaApp.Repository
 {
-    public class ProductoRepository : IProductoRepository
+    //IMPLEMENTO la I generica y le paso la entidad en este caso producto
+    public class ProductoRepository : IGenericRepository<Producto>
     {
 
 
-        public Task<Producto> ActualizarAsync(Producto producto)
+        public Task<Producto> ActualizarAsync(Producto entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Producto> CrearAsync(Producto producto)
+        public Task<Producto> CrearAsync(Producto entity)
         {
             throw new NotImplementedException();
         }

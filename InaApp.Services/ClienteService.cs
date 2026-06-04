@@ -8,25 +8,24 @@ using System.Threading.Tasks;
 
 namespace InaApp.Services
 {
-    public class ClienteService : IClienteService
+    public class ClienteService : IGenericService<Cliente>
     {
-        private readonly IClienteRepository _clienteRepository;
+        private readonly IGenericRepository<Cliente> _clienteRepository;
 
 
-        public ClienteService(IClienteRepository clienteRepository)
+        public ClienteService(IGenericRepository<Cliente> clienteRepository)
         {
            _clienteRepository = clienteRepository;
         }
 
 
 
-
-        public Task<Cliente> ActualizarAsync(Cliente cliente)
+        public Task<Cliente> ActualizarAsync(Cliente entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Cliente> CrearAsync(Cliente cliente)
+        public Task<Cliente> CrearAsync(Cliente entity)
         {
             throw new NotImplementedException();
         }
@@ -44,7 +43,6 @@ namespace InaApp.Services
         public Task<List<Cliente>> ObtenerTodosAsync()
         {
             _clienteRepository.ObtenerTodosAsync();
-
             return null;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using InaApp.Common.Interfaces;
+using InaApp.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,10 @@ namespace InaApp.Api.Controllers
     [Route("api/cliente")]
     public class ClienteController : Controller
     {
-        private readonly IClienteService _clienteService;
+        private readonly IGenericService<Cliente> _clienteService;
 
 
-        public ClienteController(IClienteService clienteService)
+        public ClienteController(IGenericService<Cliente> clienteService)
         {
             _clienteService = clienteService;
         }

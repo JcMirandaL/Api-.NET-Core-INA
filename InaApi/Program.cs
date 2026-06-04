@@ -1,4 +1,5 @@
 //imports 
+using InaApp.Api.Extensions;  
 using InaApp.Common.Interfaces;
 using InaApp.Repository;
 using InaApp.Services;
@@ -7,11 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-//defino las inyeccion de dependencias
-builder.Services.AddScoped<IProductoService, ProductoService>();
-builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
-builder.Services.AddScoped<IClienteService, ClienteService>();
-builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+
+//defino inyeccion de dependencias
+//sin el archivo compartido Extensions se definian aqui las dependencias, pero para mantener el codigo mas limpio
+//y organizado se creo ese archivo compartido Extensions y se definieron las dependencias ahi,
+//y aqui solo se llama a ese metodo para agregar las dependencias a la coleccion de servicios
+builder.Services.AddAplicationServices(builder.Configuration);
+
 
 
 builder.Services.AddControllers();

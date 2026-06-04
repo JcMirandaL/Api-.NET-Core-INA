@@ -8,14 +8,17 @@ using System.Threading.Tasks;
 
 namespace InaApp.Repository
 {
-    public class ClienteRepository : IClienteRepository
+    public class ClienteRepository : IGenericRepository<Cliente>
     {
-        public Task<Cliente> ActualizarAsync(Cliente cliente)
+
+
+
+        public Task<Cliente> ActualizarAsync(Cliente entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Cliente> CrearAsync(Cliente cliente)
+        public Task<Cliente> CrearAsync(Cliente entity)
         {
             throw new NotImplementedException();
         }

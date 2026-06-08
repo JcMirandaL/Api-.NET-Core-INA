@@ -1,5 +1,6 @@
 ﻿//los using son para importar las clases de otros proyectos o librerias
 using InaApp.Common.Interfaces;
+using InaApp.Common.Exceptions;
 using InaApp.Entities;
 using System;
 using System.Collections.Generic;
@@ -29,35 +30,50 @@ namespace InaApp.Services
 
 
 
+        public async Task<List<Producto>> ObtenerTodosAsync()
 
-        public Task<Producto> ActualizarAsync(Producto entity)
         {
-            throw new NotImplementedException();
+            return await _productoRepository.ObtenerTodosAsync();
+
         }
 
-        public Task<Producto> CrearAsync(Producto entity)
+
+        public async Task<Producto> ObtenerPorIdAsync(int id)
         {
-            throw new NotImplementedException();
+            if (id <= 0)
+            {
+                throw new PositiveIdException();
+            }
+
+            return await _productoRepository.ObtenerPorIdAsync(id);
         }
 
-        public Task<bool> EliminarAsync(int id)
+
+        public async Task<Producto> CrearAsync(Producto entity)
         {
-            throw new NotImplementedException();
+            //llamo al metodo del rewpo y le paso la entidad q llega x params
+            return await _productoRepository.CrearAsync(entity);
         }
 
-        public Task<Producto> ObtenerPorIdAsync(int id)
+
+        public async Task<Producto> ActualizarAsync(Producto entity)
         {
-            throw new NotImplementedException();
+            return await _productoRepository.ActualizarAsync(entity);
         }
 
-        public Task<List<Producto>> ObtenerTodosAsync()
+
+
+        public async Task<bool> EliminarAsync(int id)
         {
-            _productoRepository.ObtenerTodosAsync();
 
-            return null;
+            //TODO: reglas negocio
+            
 
-
+            return await _productoRepository.EliminarAsync(id);
         }
+
+
+        
     
     
     }

@@ -1,7 +1,9 @@
 ﻿using InaApp.Common.Interfaces;
+using InaApp.Common.Exceptions;
 using InaApp.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace InaApp.Api.Controllers
 {
@@ -31,89 +33,139 @@ namespace InaApp.Api.Controllers
 
 
         // CRUD BASICO 
+        //OBTENER TODOS LOS PRODUCTOS
         [HttpGet]//decorador para decir que la ruta es de un get
         //el ActionResult es para indicar que devuelce un status code 
-        public ActionResult Index()//index es obtener todos
+        public async Task<ActionResult> IndexAsync()//index es obtener todos
         {
-            //llamo al metodo del service
-            _productoService.ObtenerTodosAsync();
+            try
+            {
+                //llamo al metodo del service, var es una variable que se infiere el tipo de dato automaticamente 
+                var lista = await _productoService.ObtenerTodosAsync();
 
-            //200 = ok
-            return StatusCode(200, "correcto, real");
+                if (lista == null || lista.Count == 0)
+                {
+                    //404 = not found, puedo usar StatusCode o directamente el NotFound en vez de StatusCode 
+                    return StatusCode(404, "No se encontraron productos activos");
+                }
+
+                //200 = ok, puedo usar StatusCode o directamente el Ok  
+                return StatusCode(200, lista);
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
+            }
         }
 
 
+        //OBTENER POR ID
         [HttpGet( "{id}" )]
         // GET: htps://localhost:5001/api/producto/5
-        public ActionResult Details(int id)//details es obtener por id o x detalle ese parametro de la ruta debe llamrse igaul al parametro del metodo
+        public async Task<ActionResult> DetailsAsync(int id)//details es obtener por id o x detalle ese parametro de la ruta debe llamrse igaul al parametro del metodo
         {
-            return Ok("hola"); 
+            try
+            {
+                var producto = await _productoService.ObtenerPorIdAsync(id);
+
+                if (producto == null)
+                {
+                    throw new EntityNotExistDbException();
+                }
+
+                return Ok(producto);
+            }
+            catch (PositiveIdException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (EntityNotExistDbException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
+
+            }
         }
+
 
 
         // GET: ProductoController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: ProductoController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        //le digo que obtenga el product del body de la solicitud y que es de tipo Producto y la variabl producto,
+        //Task = metodo asincrono, ActionResult = devuelve un status code
+        public async Task<ActionResult> Create([FromBody] Producto producto)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var result = await _productoService.CrearAsync(producto);
+
+                //Created es = 201, es lo mismo q StatusCode(201, result)
+                return Created("Producto creado correctamente", result);
+                
             }
-            catch
+            catch (Exception)
             {
-                return View();
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
             }
         }
 
 
+
+        //ACTUALIZAR POR ID
+        [HttpPatch("{id}")]
         // GET: ProductoController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: ProductoController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> EditAsync([FromRoute] int id, [FromBody] Producto entity)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var productoExistente = await _productoService.ObtenerPorIdAsync(id);
+
+                if (productoExistente == null)
+                {
+                    return NotFound("Producto no encontrado");
+                }
+
+                //llamo al metodo del service y le paso el producto encontrado
+                await _productoService.ActualizarAsync(productoExistente);
+                
+                return Ok("Producto actualizado correctamente");
             }
-            catch
+            catch (Exception)
             {
-                return View();
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
             }
         }
 
-        
+
+
+        //ELIMINAR POR ID(BORRADO LOGICO)
         // GET: ProductoController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: ProductoController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        [HttpDelete("{id}")] // le paso x parametro el id en la ruta, htps://localhost:5001/api/producto/5
+        public async Task<ActionResult> DeleteAsync(int id)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (id <= 0)
+                {
+                    return BadRequest("Error al eliminar, Id incorrecto");
+                }
+
+                var result = await _productoService.EliminarAsync(id);
+
+                //si es 200 msj positivo SiNo msj negativo
+                return result ? Ok("Producto eliminado correctamente") : BadRequest("Error al eliminar el producto");
             }
-            catch
+            catch (Exception)
             {
-                return View();
+
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
             }
         }
+
+      
     }
 }

@@ -23,15 +23,16 @@ namespace InaApp.Entities
         public int Id { get; set; }
 
         //get set es una propiedad de acceso que permite obtener o establecer el valor de una propiedad
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Precio { get; set; }
         
         public int Stock { get; set; }
         
-        public string Descripcion { get; set; }
-        
+        //string empy lo inicia en cero y evita el warning de propiedad null
+        public string Descripcion { get; set; } = string.Empty;
+
         public bool Estado { get; set; }
 
 

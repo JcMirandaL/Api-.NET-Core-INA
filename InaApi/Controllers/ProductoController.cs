@@ -43,19 +43,18 @@ namespace InaApp.Api.Controllers
                 //llamo al metodo del service, var es una variable que se infiere el tipo de dato automaticamente 
                 var lista = await _productoService.ObtenerTodosAsync();
 
-                if (lista == null || lista.Count == 0)
-                {
-                    //404 = not found, puedo usar StatusCode o directamente el NotFound en vez de StatusCode 
-                    return StatusCode(404, "No se encontraron productos activos");
-                }
 
                 //200 = ok, puedo usar StatusCode o directamente el Ok  
                 return StatusCode(200, lista);
             }
-            catch (Exception)
+            catch (NotFoundDbException ex)
             {
-
-                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
+                //devuelve 404(no encontrado) y el msj perzonalizado 
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
             }
         }
 
@@ -69,25 +68,22 @@ namespace InaApp.Api.Controllers
             {
                 var producto = await _productoService.ObtenerPorIdAsync(id);
 
-                if (producto == null)
-                {
-                    throw new EntityNotExistDbException();
-                }
-
                 return Ok(producto);
             }
-            catch (PositiveIdException ex)
+            //except perzonalizadas, si no entra en niguno va al ultimo al 500
+            catch (NotNumberPositiveException ex)
             {
-                return BadRequest(ex.Message);
+                //duvuelve 400(Datos incorrectos) y el msj perzonalizado
+                return BadRequest(ex.Message); 
             }
-            catch (EntityNotExistDbException ex)
+            catch (NotFoundDbException ex)
             {
+                //devuelve 404(no encontrado) y el msj perzonalizado 
                 return NotFound(ex.Message);
             }
-            catch (Exception)
-            {
-                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
-
+            catch (Exception ex)
+            {   //500 error interno del servido
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador: " + ex.Message);
             }
         }
 
@@ -107,6 +103,15 @@ namespace InaApp.Api.Controllers
                 return Created("Producto creado correctamente", result);
                 
             }
+            catch (NotNumberPositiveException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (EntityExistDbException ex)
+            {
+                //409 = conflic (datos duplicados)
+                return Conflict(ex.Message);
+            }
             catch (Exception)
             {
                 return StatusCode(500, "Error en el servidor. Contacte con el administrador");
@@ -116,23 +121,29 @@ namespace InaApp.Api.Controllers
 
 
         //ACTUALIZAR POR ID
-        [HttpPatch("{id}")]
+        [HttpPut]
         // GET: ProductoController/Edit/5
-        public async Task<ActionResult> EditAsync([FromRoute] int id, [FromBody] Producto entity)
+        public async Task<ActionResult> EditAsync([FromBody] Producto producto)
         {
             try
             {
-                var productoExistente = await _productoService.ObtenerPorIdAsync(id);
-
-                if (productoExistente == null)
-                {
-                    return NotFound("Producto no encontrado");
-                }
-
+              
                 //llamo al metodo del service y le paso el producto encontrado
-                await _productoService.ActualizarAsync(productoExistente);
+                await _productoService.ActualizarAsync(producto);
                 
                 return Ok("Producto actualizado correctamente");
+            }
+            catch (EntityExistDbException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (NotFoundDbException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (NotNumberPositiveException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception)
             {
@@ -149,20 +160,18 @@ namespace InaApp.Api.Controllers
         {
             try
             {
-                if (id <= 0)
-                {
-                    return BadRequest("Error al eliminar, Id incorrecto");
-                }
-
                 var result = await _productoService.EliminarAsync(id);
 
                 //si es 200 msj positivo SiNo msj negativo
-                return result ? Ok("Producto eliminado correctamente") : BadRequest("Error al eliminar el producto");
+                return Ok("Producto eliminado correctamente" + result);
             }
-            catch (Exception)
+            catch (NotFoundDbException ex)
             {
-
-                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
             }
         }
 

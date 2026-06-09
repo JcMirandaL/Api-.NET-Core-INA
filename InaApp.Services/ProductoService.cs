@@ -33,24 +33,57 @@ namespace InaApp.Services
         public async Task<List<Producto>> ObtenerTodosAsync()
 
         {
-            return await _productoRepository.ObtenerTodosAsync();
+            var listaProductos = await _productoRepository.ObtenerTodosAsync();
 
+            if (listaProductos is null || listaProductos.Count == 0)
+            {
+                throw new NotFoundDbException("No se encontraron productos en la base de datos.");
+            }
+
+            return await _productoRepository.ObtenerTodosAsync();
         }
 
 
         public async Task<Producto> ObtenerPorIdAsync(int id)
         {
+            var producto = await _productoRepository.ObtenerPorIdAsync(id);
+
+            if (producto == null)
+            {
+                //exception personalizada y le paso el string template como poarametro
+                //string tmplate = enacdenar texto sin concatenar con el + 
+                throw new NotFoundDbException($"El producto con Id {id} no existe.");
+            }
             if (id <= 0)
             {
-                throw new PositiveIdException();
+                //msj perzonalizado 
+                throw new NotNumberPositiveException($"El Id del producto debe ser mayor a cero. Id Ingresado: {id}.");
             }
 
-            return await _productoRepository.ObtenerPorIdAsync(id);
+            return producto;
         }
 
 
         public async Task<Producto> CrearAsync(Producto entity)
         {
+            var productoExistente = await _productoRepository.ObtenerPorNombreAsync(entity.Nombre);
+
+            if (productoExistente != null) 
+            { 
+                throw new EntityExistDbException($"El producto con nombre '{entity.Nombre}' ya existe en la base de datos.");
+            }
+
+            if (entity.Stock <= 0)
+            {
+                throw new NotNumberPositiveException($"El stock debe ser mayor a 0. Stock Ingresado: {entity.Stock}");
+            }
+
+            if (entity.Precio <= 0)
+            {
+                throw new NotNumberPositiveException($"El precio debe ser mayor a 0. Precio Ingresado: {entity.Precio}");
+            }
+
+
             //llamo al metodo del rewpo y le paso la entidad q llega x params
             return await _productoRepository.CrearAsync(entity);
         }
@@ -58,6 +91,40 @@ namespace InaApp.Services
 
         public async Task<Producto> ActualizarAsync(Producto entity)
         {
+            var nombreExistente = await _productoRepository.ObtenerPorNombreAsync(entity.Nombre);
+            var productoExistente = await _productoRepository.ObtenerPorIdAsync(entity.Id);
+            
+            if (entity == null)
+            {
+                throw new NotFoundDbException();
+            }
+
+            if (entity.Id <= 0)
+            {
+                throw new NotNumberPositiveException();
+            }
+
+            if (productoExistente != null && productoExistente.Id != entity.Id)
+            {
+                throw new EntityExistDbException($"El Id '{entity.Id}' ya existe en la base de datos.");
+            }
+
+            if (nombreExistente != null && nombreExistente.Id != entity.Id)
+            {
+                throw new EntityExistDbException($"El producto con nombre '{entity.Nombre}' ya existe en la base de datos.");
+            }
+
+            if (entity.Stock <= 0)
+            {
+                throw new NotNumberPositiveException($"El stock debe ser mayor a 0. Stock Ingresado: {entity.Stock}");
+            }
+
+            if (entity.Precio <= 0)
+            {
+                throw new NotNumberPositiveException($"El precio debe ser mayor a 0. Precio Ingresado: {entity.Precio}");
+            }
+
+            
             return await _productoRepository.ActualizarAsync(entity);
         }
 
@@ -65,17 +132,18 @@ namespace InaApp.Services
 
         public async Task<bool> EliminarAsync(int id)
         {
+            //variable q guardara el producto encointrado en el repo, le paso el id como parametro
+            var producto = await _productoRepository.ObtenerPorIdAsync(id);
 
-            //TODO: reglas negocio
+            if (producto == null)
+            {
+                throw new NotFoundDbException($"El producto con el Id {id} no existe.");
+            }
             
-
             return await _productoRepository.EliminarAsync(id);
         }
 
-
-        
-    
-    
+      
     }
 
 }

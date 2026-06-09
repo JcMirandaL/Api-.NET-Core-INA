@@ -16,6 +16,8 @@ namespace InaApp.Common.Interfaces
         //de la base datos, el Async solo para q se sepa q ese metod es asincrono
         Task<E> ObtenerPorIdAsync(int id);
 
+        Task<E> ObtenerPorNombreAsync(string nombre);
+
         Task<E> CrearAsync(E entity);
 
         Task<E> ActualizarAsync(E entity);

@@ -33,6 +33,11 @@ namespace InaApp.Repository
             throw new NotImplementedException();
         }
 
+        public Task<Cliente> ObtenerPorNombreAsync(string nombre)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<Cliente>> ObtenerTodosAsync()
         {
             throw new NotImplementedException();

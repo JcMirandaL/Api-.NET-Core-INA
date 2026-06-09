@@ -28,96 +28,68 @@ namespace InaApp.Repository
 
         public async Task<Producto> ObtenerPorIdAsync(int id)
         {
-           
             //variable para al;macenar la entity q devuelve la base datos
-            return await _context.Productos
+            //AsNoTracking() se utiliza para indicar que no se va a realizar un seguimiento de los cambios en la entidad,
+            //esto mejora el rendimiento cuando solo se necesita leer los datos sin modificarlos
+            return await _context.Productos.AsNoTracking()
                 .Where(x => x.Id == id && x.Estado == true)
                 .SingleOrDefaultAsync();
 
         }
 
 
+
+        public async Task<Producto> ObtenerPorNombreAsync(string nombre)
+        {
+            //el AsNoTracking() se utiliza para indicar que no se va a realizar un seguimiento de los cambios en la entidad,
+            //esto mejora el rendimiento cuando solo se necesita leer los datos sin modificarlos
+            return await _context.Productos.AsNoTracking()
+                .Where(x => x.Nombre == nombre && x.Estado == true)
+                .SingleOrDefaultAsync(); 
+        }
+
+
+
         public async Task<List<Producto>> ObtenerTodosAsync()
         {
-            try
-            {
-                //utilizo el contexto para acceder a la tabla de productos y traigo todos los productos de la base de datos, lo convierto a una listaaSINCRONA y lo retorno
-                //expresion lanbda para filtrar los productos por estado, solo traigo los productos que esten activos (estado=true)
-                return await _context.Productos.Where(x => x.Estado == true).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                //si hay un error lo capturo y lo lanzo para que se maneje en el controlador
-                throw new Exception($"Error al obtener los productos: {ex.Message}");
-
-            }
+            //utilizo el contexto para acceder a la tabla de productos y traigo todos los productos de la base de datos, lo convierto a una listaaSINCRONA y lo retorno
+            //expresion lanbda para filtrar los productos por estado, solo traigo los productos que esten activos (estado=true)
+            return await _context.Productos.AsNoTracking()
+                .Where(x => x.Estado == true).ToListAsync();
         }
 
 
 
 
         public async Task<Producto> CrearAsync(Producto entity)
-        {
-            try
-            {
-                _context.Productos.Add(entity);
-                await _context.SaveChangesAsync();
-                return entity;
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception($"Error al crear elemento: {ex.Message}");
-            }   
+        {  
+            _context.Productos.Add(entity);
+            await _context.SaveChangesAsync();
+            return entity;   
         }
 
 
         public async Task<Producto> ActualizarAsync(Producto entity)
         {
-            try
-            {
-                //llamo al context y le paso la entidad completa para que actualice los campos que se hayan modificado
-                _context.Productos.Update(entity);
-                //guardo los cambios en la base de datos y retorno la entidad actualizada
-                await _context.SaveChangesAsync();
+            //llamo al context y le paso la entidad completa para que actualice los campos que se hayan modificado
+            _context.Productos.Update(entity);
+            //guardo los cambios en la base de datos y retorno la entidad actualizada
+            await _context.SaveChangesAsync();
 
-                //retorno la entidad actualizada
-                return entity;
-
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception($"Error al actualizar el elemento: {ex.Message}");
-            }
-
-
+            //retorno la entidad actualizada
+            return entity;
         }
 
         
         public async Task<bool> EliminarAsync(int id)
         {
-            try
-            {
-                //creo variable q guardara el producto encointrado con el metodo obtenerPorIdAsync, le paso el id que se recibe como parametro
-                var producto = await ObtenerPorIdAsync(id);
+            var producto = await ObtenerPorIdAsync(id);
 
-                if (producto == null)
-                {
-                    return false;
-                }
+            producto.Estado = false; // Cambia el estado a false para marcarlo como eliminado
 
-                producto.Estado = false; // Cambia el estado a false para marcarlo como eliminado
-
-                _context.Productos.Update(producto);// Actualiza el producto en el contexto
-                await _context.SaveChangesAsync(); // Guarda los cambios en la base de datos
-                return true;// Retorna true si la eliminación fue exitosa
-            }
-            //ex captura cualquier error que pueda ocurrir durante el proceso de eliminación y lanza una nueva excepción con un mensaje personalizado que incluye el mensaje original del error.
-            catch (Exception ex)
-            {
-                throw new Exception($"Error al eliminar el elemento: {ex.Message}");
-            }
+            _context.Productos.Update(producto);// Actualiza el producto en el contexto
+            await _context.SaveChangesAsync(); // Guarda los cambios en la base de datos
+            return true;// Retorna true si la eliminación fue exitosa
         }
 
 

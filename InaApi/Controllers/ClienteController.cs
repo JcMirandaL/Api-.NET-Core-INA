@@ -1,4 +1,5 @@
-﻿using InaApp.Common.Interfaces;
+﻿using InaApp.Common.Exceptions;
+using InaApp.Common.Interfaces;
 using InaApp.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ namespace InaApp.Api.Controllers
     {
         private readonly IGenericService<Cliente> _clienteService;
 
-
+         
         public ClienteController(IGenericService<Cliente> clienteService)
         {
             _clienteService = clienteService;
@@ -20,82 +21,150 @@ namespace InaApp.Api.Controllers
 
 
 
+        // GET: ClienteController/Details/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult> DetailsAsync(int id)
+        {
+            try
+            {
+                var cliente = await _clienteService.ObtenerPorIdAsync(id);
+
+                return Ok(cliente);
+
+            }
+            catch (NotFoundDbException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (NotNumberPositiveException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
+            }
+
+        }
+
+
         // GET: ClienteController
         [HttpGet]
-        public ActionResult Index()
+        public async Task<ActionResult> IndexAsync()
         {
-            _clienteService.ObtenerTodosAsync();
-    
-            return StatusCode(200, "Obteniendo....");
-            
+            try
+            {
+                var listaClientes = await _clienteService.ObtenerTodosAsync();
+
+                return Ok(listaClientes);
+
+            }
+            catch (NotFoundDbException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            { 
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
+            }
         }
 
-        // GET: ClienteController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
 
-        // GET: ClienteController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
+        
 
         // POST: ClienteController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> CreateAsync([FromBody] Cliente cliente)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+           try
+           {
+                var result = await _clienteService.CrearAsync(cliente);
+
+                return Created("Cliente creado correctamente", result);
+
+           }
+           catch (NotFoundDbException ex)
+           {     
+                return BadRequest(ex.Message);
+           }
+           catch (EntityExistDbException ex)
+           {
+                 return Conflict(ex.Message);
+           }
+           catch (NotNumberPositiveException ex)
+           {
+                return BadRequest(ex.Message);
+           }
+           catch (InvalidEnumException ex)
+           {
+                return BadRequest(ex.Message);
+           }
+           catch (Exception ex)
+           {
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
+           }
         }
 
-        // GET: ClienteController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+       
 
         // POST: ClienteController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        [HttpPut]
+        public async Task<ActionResult> EditAsync([FromBody] Cliente cliente)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                await _clienteService.ActualizarAsync(cliente);
+
+                return Ok("Cliente actualizado correctamente");
+
             }
-            catch
+            catch (NotFoundDbException ex)
             {
-                return View();
+                return NotFound(ex.Message);
+            }
+            catch (NotNumberPositiveException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (EntityExistDbException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (InvalidEnumException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
+
             }
         }
 
-        // GET: ClienteController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+       
 
         // POST: ClienteController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteAsync(int id)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                await _clienteService.EliminarAsync(id);
+
+                return Ok("Cliente eliminado correctamente");
+
             }
-            catch
+            catch (NotNumberPositiveException ex)
             {
-                return View();
+                return BadRequest(ex.Message);
+            }
+            catch (NotFoundDbException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
             }
         }
     }

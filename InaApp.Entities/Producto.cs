@@ -20,22 +20,37 @@ namespace InaApp.Entities
         //propiedades = variables o atributos de una clase/objeto
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int Id { get; set; } 
 
         //get set es una propiedad de acceso que permite obtener o establecer el valor de una propiedad
+        [Required]
+        [StringLength(100, MinimumLength = 3)]
         public string Nombre { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(18,2)")]
+        [Required]
+        [Range(0.01, 9999.99)]
         public decimal Precio { get; set; }
-        
-        public int Stock { get; set; }
-        
-        //string empy lo inicia en cero y evita el warning de propiedad null
-        public string Descripcion { get; set; } = string.Empty;
 
+        [Required]
+        [Range(0, 999)]
+        public int Stock { get; set; }
+
+        //string empy lo inicia en cero y evita el warning de propiedad null
+        [StringLength(500)]
+        public string? Descripcion { get; set; } = string.Empty;
+
+        [Required]
         public bool Estado { get; set; }
 
+        [Required]
+        public DateTime FechaCreacion { get; set; } = DateTime.Now;
 
+        [Required]
+        public DateTime FechaModificacion { get; set; } = DateTime.Now;
+
+        [Required]
+        public string UsuarioCreacion { get; set; } = "admin";
 
 
 

@@ -1,5 +1,7 @@
 ﻿using InaApp.Common.Interfaces;
+using InaApp.Data;
 using InaApp.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,37 +12,61 @@ namespace InaApp.Repository
 {
     public class ClienteRepository : IGenericRepository<Cliente>
     {
+        private readonly ApplicationDbContex _context;
 
-
-
-        public Task<Cliente> ActualizarAsync(Cliente entity)
+        public ClienteRepository(ApplicationDbContex context)
         {
-            throw new NotImplementedException();
+            _context = context;
+        }
+         
+
+
+
+        //crud
+        public async Task<Cliente> ObtenerPorIdAsync(int id)
+        {
+            return await _context.Clientes.AsNoTracking()
+                .Where(x => x.Id == id && x.Estado == true)
+                .SingleOrDefaultAsync();
         }
 
-        public Task<Cliente> CrearAsync(Cliente entity)
+
+        public async Task<List<Cliente>> ObtenerTodosAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Clientes.AsNoTracking()
+                .Where(x => x.Estado == true)
+                .ToListAsync();
         }
 
-        public Task<bool> EliminarAsync(int id)
+
+        public async Task<Cliente> CrearAsync(Cliente entity)
         {
-            throw new NotImplementedException();
+            _context.Clientes.Add(entity);
+            await _context.SaveChangesAsync();
+            return entity;
+        }
+        
+        
+        public async Task<Cliente> ActualizarAsync(Cliente entity)
+        {
+            _context.Clientes.Update(entity);
+            await _context.SaveChangesAsync();
+            return entity;
+
         }
 
-        public Task<Cliente> ObtenerPorIdAsync(int id)
+
+        public async Task<bool> EliminarAsync(int id)
         {
-            throw new NotImplementedException();
+            var cliente = await ObtenerPorIdAsync(id);
+
+            cliente.Estado = false;
+
+            _context.Clientes.Update(cliente);
+            await _context.SaveChangesAsync();
+            return true;
+
         }
 
-        public Task<Cliente> ObtenerPorNombreAsync(string nombre)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Cliente>> ObtenerTodosAsync()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

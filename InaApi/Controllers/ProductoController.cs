@@ -13,7 +13,7 @@ namespace InaApp.Api.Controllers
     [ApiController]//indica que esta clase es un controlador de API, lo que significa que se espera que maneje solicitudes HTTP y genere respuestas HTTP
     //cuando pongo [controller] toma solo el nombre del controller en minuscula en este caso producto omitiendo la parte de Controller del nombre. ruta= https://localhost:5001/api/producto
     [Route("api/[controller]")]//define la ruta pricipal para las solicitudes HTTP, htps://localhost:5001/api/producto
-    public class ProductoController : Controller//hereda de la clase Controller para poder usar sus metodos y propiedades
+    public class ProductoController : Controller//hereda de la clase Controller para poder usar sus metodos y propiedades 
     {
 
         //variable para guardar esa instancia, se tipa de tipo interface y el nombre con _ para indicar que es una variable privada
@@ -93,7 +93,7 @@ namespace InaApp.Api.Controllers
         [HttpPost]
         //le digo que obtenga el product del body de la solicitud y que es de tipo Producto y la variabl producto,
         //Task = metodo asincrono, ActionResult = devuelve un status code
-        public async Task<ActionResult> Create([FromBody] Producto producto)
+        public async Task<ActionResult> CreateAsync([FromBody] Producto producto)
         {
             try
             {
@@ -101,7 +101,7 @@ namespace InaApp.Api.Controllers
 
                 //Created es = 201, es lo mismo q StatusCode(201, result)
                 return Created("Producto creado correctamente", result);
-                
+                 
             }
             catch (NotNumberPositiveException ex)
             {
@@ -112,9 +112,9 @@ namespace InaApp.Api.Controllers
                 //409 = conflic (datos duplicados)
                 return Conflict(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
             }
         }
 
@@ -145,9 +145,9 @@ namespace InaApp.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
             }
         }
 

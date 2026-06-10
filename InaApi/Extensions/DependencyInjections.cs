@@ -37,7 +37,9 @@ namespace InaApp.Api.Extensions
 
 
             //inyecciones de dependencia de repository
-            services.AddScoped<IGenericRepository<Producto>, ProductoRepository>();
+            //noi uso l Igeneric xq en el service no la uso en el const4ructor
+            //xq el repo de producto tiene metodos propios, entonces no puedo usar el tipado de IGenericRepository
+            services.AddScoped<ProductoRepository>();
             services.AddScoped<IGenericRepository<Cliente>, ClienteRepository>();
 
 

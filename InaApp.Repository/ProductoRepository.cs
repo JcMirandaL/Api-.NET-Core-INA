@@ -22,9 +22,7 @@ namespace InaApp.Repository
             //hago la inyesccion de dependencia
             _context = context;
         }
-
-
-
+         
 
         public async Task<Producto> ObtenerPorIdAsync(int id)
         {
@@ -35,17 +33,6 @@ namespace InaApp.Repository
                 .Where(x => x.Id == id && x.Estado == true)
                 .SingleOrDefaultAsync();
 
-        }
-
-
-
-        public async Task<Producto> ObtenerPorNombreAsync(string nombre)
-        {
-            //el AsNoTracking() se utiliza para indicar que no se va a realizar un seguimiento de los cambios en la entidad,
-            //esto mejora el rendimiento cuando solo se necesita leer los datos sin modificarlos
-            return await _context.Productos.AsNoTracking()
-                .Where(x => x.Nombre == nombre && x.Estado == true)
-                .SingleOrDefaultAsync(); 
         }
 
 
@@ -92,6 +79,16 @@ namespace InaApp.Repository
             return true;// Retorna true si la eliminación fue exitosa
         }
 
+
+
+        public async Task<Producto> ObtenerPorNombreAsync(string nombre)
+        {
+            //el AsNoTracking() se utiliza para indicar que no se va a realizar un seguimiento de los cambios en la entidad,
+            //esto mejora el rendimiento cuando solo se necesita leer los datos sin modificarlos
+            return await _context.Productos.AsNoTracking()
+                .Where(x => x.Nombre == nombre && x.Estado == true)
+                .SingleOrDefaultAsync();
+        }
 
     }
 }

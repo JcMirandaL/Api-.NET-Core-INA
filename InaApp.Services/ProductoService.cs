@@ -8,11 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using InaApp.DTOs.Producto;
 
 namespace InaApp.Services
 {
     //los : son para implementar una interfaz o heredar de una clase, en este caso se implementa la interfaz generioca y se le pasa la entidad producto
-    public class ProductoService : IGenericService<Producto>
+    public class ProductoService : IGenericService<ProductoResponseDTO, ProductoCreateDTO, ProductoUpdateDTO>
     {
         //variable guarda instancia del repo, del tipo de la clase 'ProductoRepository, el nombre con _ para indicar que es una variable privada
         private readonly ProductoRepository _productoRepository;
@@ -31,7 +32,7 @@ namespace InaApp.Services
 
 
 
-        public async Task<List<Producto>> ObtenerTodosAsync()
+        public async Task<List<ProductoResponseDTO>> ObtenerTodosAsync()
 
         {
             var listaProductos = await _productoRepository.ObtenerTodosAsync();
@@ -41,11 +42,11 @@ namespace InaApp.Services
                 throw new NotFoundDbException("No se encontraron productos en la base de datos.");
             }
 
-            return listaProductos; 
+            return new List<ProductoResponseDTO>();
         }
 
 
-        public async Task<Producto> ObtenerPorIdAsync(int id)
+        public async Task<ProductoResponseDTO> ObtenerPorIdAsync(int id)
         {
             if (id <= 0)
             {
@@ -62,11 +63,11 @@ namespace InaApp.Services
                 throw new NotFoundDbException($"El producto con Id {id} no existe.");
             }
 
-            return producto;
+            return new ProductoResponseDTO();
         }
 
 
-        public async Task<Producto> CrearAsync(Producto entity)
+        public async Task<ProductoResponseDTO> CrearAsync(ProductoCreateDTO entity)
         {
             var productoExistente = await _productoRepository.ObtenerPorNombreAsync(entity.Nombre);
 
@@ -85,13 +86,14 @@ namespace InaApp.Services
                 throw new NotNumberPositiveException($"El precio debe ser mayor a 0. Precio Ingresado: {entity.Precio}");
             }
 
+            var producto = await _productoRepository.CrearAsync(new Producto());
 
             //llamo al metodo del rewpo y le paso la entidad q llega x params
-            return await _productoRepository.CrearAsync(entity);
+            return new ProductoResponseDTO();
         }
 
 
-        public async Task<Producto> ActualizarAsync(Producto entity)
+        public async Task<ProductoResponseDTO> ActualizarAsync(ProductoUpdateDTO entity)
         {
             
             if (entity.Id <= 0)
@@ -121,8 +123,9 @@ namespace InaApp.Services
                 throw new NotNumberPositiveException($"El precio debe ser mayor a 0. Precio Ingresado: {entity.Precio}");
             }
 
+            var producto = await _productoRepository.ActualizarAsync(new Producto());
             
-            return await _productoRepository.ActualizarAsync(entity);
+            return new ProductoResponseDTO();
         }
 
 

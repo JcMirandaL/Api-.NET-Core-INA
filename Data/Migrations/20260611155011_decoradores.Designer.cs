@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InaApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContex))]
-    [Migration("20260610212249_inicial")]
-    partial class Inicial
+    [Migration("20260611155011_decoradores")]
+    partial class decoradores
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

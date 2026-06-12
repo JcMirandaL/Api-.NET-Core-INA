@@ -1,15 +1,12 @@
 ﻿using InaApp.Common.Exceptions;
 using InaApp.Common.Interfaces;
+using InaApp.DTOs.ClienteDTOs;
 using InaApp.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace InaApp.Services
 {
-    public class ClienteService : IGenericService<Cliente>
+    public class ClienteService : IGenericService<ClienteResponseDTO, ClienteCreateDTO, ClienteUpdateDTO>
     { 
         //el service de producto no uso el tipado de IGenericRepository xq el repo de producto tiene metodos propios,
         //pero el repo de cliente no tiene metodos propios entonces si puedo usar el tipado de IGenericRepository
@@ -26,7 +23,7 @@ namespace InaApp.Services
 
 
 
-        public async Task<Cliente> ObtenerPorIdAsync(int id)
+        public async Task<ClienteResponseDTO> ObtenerPorIdAsync(int id)
         {
             if (id <= 0)
             {
@@ -39,11 +36,11 @@ namespace InaApp.Services
                 throw new NotFoundDbException($"El cliente con Id '{id}' no existe o esta inactivo en la base de datos.");
             }
 
-            return clienteExistente; 
+            return new ClienteResponseDTO(); 
         }
 
            
-        public async Task<List<Cliente>> ObtenerTodosAsync()
+        public async Task<List<ClienteResponseDTO>> ObtenerTodosAsync()
         {
             var listaClientes = await _clienteRepository.ObtenerTodosAsync();
 
@@ -52,18 +49,18 @@ namespace InaApp.Services
                 throw new NotFoundDbException("No se encontraron clientes activos en la base de datos.");
             }
 
-            return listaClientes; 
+            return new List<ClienteResponseDTO>(); 
             
         }
 
 
-        public async Task<Cliente> CrearAsync(Cliente entity)
+        public async Task<ClienteResponseDTO> CrearAsync(ClienteCreateDTO entity)
         {
 
-            var clienteExistente = await _clienteRepository.ObtenerPorIdAsync(entity.Id);
+            var clienteExistente = await _clienteRepository.ObtenerTodosAsync();
             if (clienteExistente != null)
             {
-                throw new EntityExistDbException($"El cliente con Id '{entity.Id}' ya existe en la base de datos.");
+                throw new EntityExistDbException($"El cliente con Id '{entity.Cedula}' ya existe en la base de datos.");
             }
 
             // Enum.IsDefined(entity.TipoCedula) devuelve true si el valor existe en el enum, false si no
@@ -74,12 +71,13 @@ namespace InaApp.Services
             }
 
 
-            return await _clienteRepository.CrearAsync(entity);
+            var cliente = await _clienteRepository.CrearAsync(new Cliente());
+            return new ClienteResponseDTO();
 
         }
 
 
-        public async Task<Cliente> ActualizarAsync(Cliente entity)
+        public async Task<ClienteResponseDTO> ActualizarAsync(ClienteUpdateDTO entity)
         {
             
             if (entity.Id <= 0)
@@ -105,7 +103,8 @@ namespace InaApp.Services
                 throw new InvalidEnumException($"El valor '{entity.TipoCedula}' no es un valor válido para el campo TipoCedula del cliente.");
             }
 
-            return await _clienteRepository.ActualizarAsync(entity);
+            var cliente = await _clienteRepository.ActualizarAsync(new Cliente());
+            return new ClienteResponseDTO();
         }
 
 

@@ -1,5 +1,6 @@
 ﻿using InaApp.Common.Exceptions;
 using InaApp.Common.Interfaces;
+using InaApp.DTOs.ClienteDTOs;
 using InaApp.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +11,10 @@ namespace InaApp.Api.Controllers
     [Route("api/cliente")]
     public class ClienteController : Controller
     {
-        private readonly IGenericService<Cliente> _clienteService;
+        private readonly IGenericService<ClienteResponseDTO, ClienteCreateDTO, ClienteUpdateDTO> _clienteService;
 
          
-        public ClienteController(IGenericService<Cliente> clienteService)
+        public ClienteController(IGenericService<ClienteResponseDTO, ClienteCreateDTO, ClienteUpdateDTO> clienteService)
         {
             _clienteService = clienteService;
         }
@@ -74,11 +75,20 @@ namespace InaApp.Api.Controllers
 
         // POST: ClienteController/Create
         [HttpPost]
-        public async Task<ActionResult> CreateAsync([FromBody] Cliente cliente)
+        public async Task<ActionResult> CreateAsync([FromBody] ClienteCreateDTO clientedto)
         {
            try
            {
-                var result = await _clienteService.CrearAsync(cliente);
+                //el modelState es una propiedad de la clase Controller que contiene el estado de validacion del modelo,
+                //si el modelo(entidad en cuestion) no es valido devuelve un 400 con el detalle de los errores de validacion
+                //las validaciones que usa son los decoradores del modelo entity
+                if (!ModelState.IsValid)
+                {
+                    //devuelvo el modelState q tiene los msjs de errors
+                    return BadRequest(ModelState);
+                }
+
+                var result = await _clienteService.CrearAsync(clientedto);
 
                 return Created("Cliente creado correctamente", result);
 
@@ -109,11 +119,20 @@ namespace InaApp.Api.Controllers
 
         // POST: ClienteController/Edit/5
         [HttpPut]
-        public async Task<ActionResult> EditAsync([FromBody] Cliente cliente)
+        public async Task<ActionResult> EditAsync([FromBody] ClienteUpdateDTO clienteDTO)
         {
             try
             {
-                await _clienteService.ActualizarAsync(cliente);
+                //el modelState es una propiedad de la clase Controller que contiene el estado de validacion del modelo,
+                //si el modelo(entidad en cuestion) no es valido devuelve un 400 con el detalle de los errores de validacion
+                //las validaciones que usa son los decoradores del modelo entity
+                if (!ModelState.IsValid)
+                {
+                    //devuelvo el modelState q tiene los msjs de errors
+                    return BadRequest(ModelState);
+                }
+
+                await _clienteService.ActualizarAsync(clienteDTO);
 
                 return Ok("Cliente actualizado correctamente");
 

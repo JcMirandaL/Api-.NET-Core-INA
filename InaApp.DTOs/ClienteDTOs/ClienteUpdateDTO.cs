@@ -1,25 +1,22 @@
 ﻿
+
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-//este se para poder usar el decorador Index para cedula y tipoCedula(como si fuera pk compuesta)
-using Microsoft.EntityFrameworkCore;
 using static InaApp.Common.Enums.Enumeradores;
 
-namespace InaApp.Entities
+namespace InaApp.DTOs.ClienteDTOs
 {
-    [Table(name:"tbClientes")]
-    [Index(nameof(Cedula), nameof(TipoCedula), IsUnique = true)] 
-    public class Cliente
+    public class ClienteUpdateDTO
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Required(ErrorMessage = "El Id es un campo obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El Id debe ser un numero positivo.")]
         public int Id { get; set; }
 
-        [Required (ErrorMessage = "Campo obligatorio.")]
+        [Required(ErrorMessage = "Campo obligatorio.")]
         [StringLength(20, ErrorMessage = "La cedula NO debe exeder los 20 caracteres.")]
-        public string Cedula { get; set; } = string.Empty; 
+        public string Cedula { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Campo obligatorio.")]
+        [EnumDataType(typeof(TipoCedulaEnum), ErrorMessage = "Escoja una opcion valida")]
         public TipoCedulaEnum TipoCedula { get; set; }
 
         [Required(ErrorMessage = "Campo obligatorio.")]
@@ -34,30 +31,16 @@ namespace InaApp.Entities
         [StringLength(50, MinimumLength = 3, ErrorMessage = "El apellido 2 debe tener entre 3 y 50 caracteres.")]
         public string? Apellido2 { get; set; } = string.Empty;
 
-        [EmailAddress (ErrorMessage = "El correo electronico debe tener un formato valido.")]
+        [EmailAddress(ErrorMessage = "El correo electronico debe tener un formato valido.")]
         [MaxLength(150, ErrorMessage = "El correo electronico debe tener un maximo de 150 caracteres.")]
         public string? Correo { get; set; } = string.Empty;
 
-        [Phone (ErrorMessage = "El telefono debe tener un formato valido.")]
+        [Phone(ErrorMessage = "El telefono debe tener un formato valido.")]
         [MaxLength(20, ErrorMessage = "El telefono debe tener nun maximo de 20 caracteres.")]
         public string? Telefono { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Campo obligatorio.")]
         [DataType(DataType.Date, ErrorMessage = "La fecha debe tener un formato valido.")]
         public DateOnly FechaNacimiento { get; set; }
-
-        [Required(ErrorMessage = "Campo obligatorio.")]
-        public bool Estado { get; set; } = true;
-
-        [Required(ErrorMessage = "Campo obligatorio.")]
-        public DateTime FechaCreacion { get; set; } = DateTime.Now;
-
-        [Required(ErrorMessage = "Campo obligatorio.")]
-        public DateTime FechaModificacion { get; set; } = DateTime.Now;
-
-        //admin quemado x mientras se hace el login para sacr el usuario logueado
-        [Required(ErrorMessage = "Campo obligatorio.")]
-        public string UsuarioCreacion { get; set; } = "admin";
-
     }
 }

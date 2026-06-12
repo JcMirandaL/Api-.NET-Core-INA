@@ -23,33 +23,33 @@ namespace InaApp.Entities
         public int Id { get; set; } 
 
         //get set es una propiedad de acceso que permite obtener o establecer el valor de una propiedad
-        [Required]
-        [StringLength(100, MinimumLength = 3)]
+        [Required (ErrorMessage = "El nombre es un campo obligatorio.")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 100 caracteres.")]
         public string Nombre { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(18,2)")]
-        [Required]
-        [Range(0.01, 9999.99)]
+        [Required (ErrorMessage = "El precio es un campo obligatorio.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "El precio debe ser mayor que cero.")]
         public decimal Precio { get; set; }
 
-        [Required]
-        [Range(0, 999)]
+        [Required (ErrorMessage = "El stock es un campo obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El stock debe ser un numero positivo.")]
         public int Stock { get; set; }
 
         //string empy lo inicia en cero y evita el warning de propiedad null
-        [StringLength(500)]
+        [StringLength(500, ErrorMessage = "La descripcion NO debe superar un maximo de 500 caracterres.")]
         public string? Descripcion { get; set; } = string.Empty;
 
-        [Required]
-        public bool Estado { get; set; }
+        [Required(ErrorMessage = "El estado es un campo obligatorio.")]
+        public bool Estado { get; set; } = true;
 
-        [Required]
+        [Required (ErrorMessage = "Campo obligatorio.")]
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
 
-        [Required]
+        [Required(ErrorMessage = "Campo obligatorio.")]
         public DateTime FechaModificacion { get; set; } = DateTime.Now;
 
-        [Required]
+        [Required(ErrorMessage = "Campo obligatorio.")]
         public string UsuarioCreacion { get; set; } = "admin";
 
 

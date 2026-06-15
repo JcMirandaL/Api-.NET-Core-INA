@@ -5,7 +5,7 @@
 namespace InaApp.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class decoradores : Migration
+    public partial class Decoradores : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

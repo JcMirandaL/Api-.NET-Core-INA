@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using InaApp.DTOs.Producto;
+using AutoMapper;
 
 namespace InaApp.Services
 {
@@ -17,16 +18,19 @@ namespace InaApp.Services
     {
         //variable guarda instancia del repo, del tipo de la clase 'ProductoRepository, el nombre con _ para indicar que es una variable privada
         private readonly ProductoRepository _productoRepository;
+        //variable para inyectar mapper
+        private readonly IMapper _mapper;
 
 
         //inyecto al repo en el constructor, el constructor es un metodo especial que se ejecuta cuando se crea una instancia de la clase,
         //se usa para inicializar las variables o propiedades de la clase
         //para inyectar hay que definir la inyaccion en el program.cs, en este caso se inyecta el repo con su interface para que se pueda usar en el service
         //x parametro llega la instancia del repo que se inyecto en el program.cs, y se le asigna a la variable privada para poder usarla en los metodos del repo
-        public ProductoService(ProductoRepository productoRepository)
+        public ProductoService(ProductoRepository productoRepository, IMapper mapper)
         {
             //asigno a la variable privada la instancia que me llego por el param, detro del constructor para poder usarla en los metodos del repo
             _productoRepository = productoRepository;
+            _mapper = mapper;
         }
 
 
@@ -42,7 +46,9 @@ namespace InaApp.Services
                 throw new NotFoundDbException("No se encontraron productos en la base de datos.");
             }
 
-            return new List<ProductoResponseDTO>();
+            var listaProductosResponse = _mapper.Map<List<ProductoResponseDTO>>(listaProductos);
+
+            return listaProductosResponse;
         }
 
 
@@ -63,7 +69,11 @@ namespace InaApp.Services
                 throw new NotFoundDbException($"El producto con Id {id} no existe.");
             }
 
-            return new ProductoResponseDTO();
+            //paso de entity a responseDTO, mapea las propiedades con el mismo nombre y tipo de dato, si no son iguales hay que configurar el mapeo en el profile de automapper
+            var productoResponse = _mapper.Map<ProductoResponseDTO>(producto);
+
+            //devuelvo el DTO mapeado con los datos del producto encontrado, el mapeo se encarga de asignar los valores a las propiedades del responseDTO
+            return productoResponse;
         }
 
 
@@ -86,10 +96,40 @@ namespace InaApp.Services
                 throw new NotNumberPositiveException($"El precio debe ser mayor a 0. Precio Ingresado: {entity.Precio}");
             }
 
-            var producto = await _productoRepository.CrearAsync(new Producto());
+            //creo una nueva instancia de producto y le asigno los valores que llegan por el parametro, para luego pasarla al repo y guardarla en la base de datos
+            //MANERA VIEJA DE MAPEAR, CREANDO UNA NUEVA INSTANCIA DE LA ENTIDAD Y ASIGNANDO LOS VALORES MANUALMENTE
+            //Producto nuevoProducto = new Producto
+            //{
+            //    Nombre = entity.Nombre,
+            //    Precio = entity.Precio,
+            //    Stock = entity.Stock,
+            //    Descripcion = entity.Descripcion,
+            //};
+            //nuevoProducto = await _productoRepository.CrearAsync(nuevoProducto);
+            //ProductoResponseDTO productoResponse = new ProductoResponseDTO
+            //{
+            //    Id = nuevoProducto.Id,
+            //    Nombre = nuevoProducto.Nombre,
+            //    Precio = nuevoProducto.Precio,
+            //    Stock = nuevoProducto.Stock,
+            //    Descripcion = nuevoProducto.Descripcion
+            //};
+            ////llamo al metodo del rewpo y le paso la entidad q llega x params
+            //return productoResponse;
 
-            //llamo al metodo del rewpo y le paso la entidad q llega x params
-            return new ProductoResponseDTO();
+
+            //forma mas sensilla usando la libreria automapper
+            //pasa de createDTO a entity, mapea las propiedades con el mismo nombre y tipo de dato, si no son iguales hay que configurar el mapeo en el profile de automapper
+            //LO QUE ESTA ENTRE <> ES EL TIPO DESTINO
+            Producto nuevoProducto = _mapper.Map<Producto>(entity);
+
+            nuevoProducto = await _productoRepository.CrearAsync(nuevoProducto);
+
+            //pasa de entity a responseDTO, mapea las propiedades con el mismo nombre y tipo de dato, si no son iguales hay que configurar el mapeo en el profile de automapper
+            ProductoResponseDTO productoResponse = _mapper.Map<ProductoResponseDTO>(nuevoProducto);
+
+            //retorna el responseDTO con los datos del nuevo producto creado, el mapeo se encarga de asignar los valores a las propiedades del responseDTO
+            return productoResponse;
         }
 
 
@@ -123,9 +163,18 @@ namespace InaApp.Services
                 throw new NotNumberPositiveException($"El precio debe ser mayor a 0. Precio Ingresado: {entity.Precio}");
             }
 
-            var producto = await _productoRepository.ActualizarAsync(new Producto());
-            
-            return new ProductoResponseDTO();
+            //passo de DTO a Entity
+            //LO QUE ESTA ENTRE <> ES EL TIPO DESTINO
+            Producto productoActualizar = _mapper.Map<Producto>(entity);
+
+            //actualice con la entidad mapeada
+            productoActualizar = await _productoRepository.ActualizarAsync(productoActualizar);
+
+            //paso de entity a responseDTO
+            ProductoResponseDTO productoResponse = _mapper.Map<ProductoResponseDTO>(productoActualizar);
+
+            //devuelvo el DTO mapeado con los datos del producto actualizado
+            return productoResponse;
         }
 
 

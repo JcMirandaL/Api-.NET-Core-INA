@@ -13,7 +13,7 @@ namespace InaApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContex))]
     [Migration("20260611155440_decoradoress")]
-    partial class decoradoress
+    partial class Decoradoress
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

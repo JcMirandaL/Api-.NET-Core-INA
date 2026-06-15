@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\InaApp.Common\InaApp.Common.csproj" />
     <ProjectReference Include="..\InaApp.DTOs\InaApp.DTOs.csproj" />
     <ProjectReference Include="..\InaApp.Entities\InaApp.Entities.csproj" />

@@ -5,6 +5,7 @@ using InaApp.DTOs.Producto;
 using InaApp.Entities;
 using InaApp.Repository;
 using InaApp.Services;
+using InaApp.Services.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 namespace InaApp.Api.Extensions
@@ -30,6 +31,9 @@ namespace InaApp.Api.Extensions
             });
 
 
+            //refrencia al autoMapper(injeccion de dependencia)
+            services.AddAutoMapper(fg => { }, typeof(MappingProfile));
+
 
             //inyecciones de dependencia de services
             //defino las inyeccion de dependencias
@@ -42,7 +46,7 @@ namespace InaApp.Api.Extensions
             //noi uso l Igeneric xq en el service no la uso en el const4ructor
             //xq el repo de producto tiene metodos propios, entonces no puedo usar el tipado de IGenericRepository
             services.AddScoped<ProductoRepository>();
-            services.AddScoped<IGenericRepository<Cliente>, ClienteRepository>();
+            services.AddScoped<ClienteRepository>();
 
 
             return services;

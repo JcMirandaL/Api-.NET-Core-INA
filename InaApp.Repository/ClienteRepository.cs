@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.Repository
 {
@@ -18,7 +19,7 @@ namespace InaApp.Repository
         {
             _context = context;
         }
-         
+
 
 
 
@@ -45,8 +46,8 @@ namespace InaApp.Repository
             await _context.SaveChangesAsync();
             return entity;
         }
-        
-        
+
+
         public async Task<Cliente> ActualizarAsync(Cliente entity)
         {
             _context.Clientes.Update(entity);
@@ -68,5 +69,13 @@ namespace InaApp.Repository
 
         }
 
+
+        public async Task<Cliente> ObtenerPorCedulaAsync(string cedula)
+        {
+            return await _context.Clientes.AsNoTracking()
+                .Where(x => x.Cedula == cedula && x.Estado == true)
+                .SingleOrDefaultAsync();
+
+        }
     }
 }

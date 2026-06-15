@@ -1,7 +1,9 @@
-﻿using InaApp.Common.Exceptions;
+﻿using AutoMapper;
+using InaApp.Common.Exceptions;
 using InaApp.Common.Interfaces;
 using InaApp.DTOs.ClienteDTOs;
 using InaApp.Entities;
+using InaApp.Repository;
 
 
 namespace InaApp.Services
@@ -11,12 +13,14 @@ namespace InaApp.Services
         //el service de producto no uso el tipado de IGenericRepository xq el repo de producto tiene metodos propios,
         //pero el repo de cliente no tiene metodos propios entonces si puedo usar el tipado de IGenericRepository
         //para poder usar los metodos genericos del repo
-        private readonly IGenericRepository<Cliente> _clienteRepository;
+        private readonly ClienteRepository _clienteRepository;
 
+        private readonly IMapper _mapper;
 
-        public ClienteService(IGenericRepository<Cliente> clienteRepository)
+        public ClienteService(ClienteRepository clienteRepository, IMapper mapper)
         {
            _clienteRepository = clienteRepository;
+            _mapper = mapper;
         }
 
 
@@ -36,7 +40,9 @@ namespace InaApp.Services
                 throw new NotFoundDbException($"El cliente con Id '{id}' no existe o esta inactivo en la base de datos.");
             }
 
-            return new ClienteResponseDTO(); 
+            var clienteResponse = _mapper.Map<ClienteResponseDTO>(clienteExistente);
+
+            return clienteResponse; 
         }
 
            
@@ -48,8 +54,10 @@ namespace InaApp.Services
             {
                 throw new NotFoundDbException("No se encontraron clientes activos en la base de datos.");
             }
+            
+            var listaClientesResponse = _mapper.Map<List<ClienteResponseDTO>>(listaClientes);
 
-            return new List<ClienteResponseDTO>(); 
+            return listaClientesResponse; 
             
         }
 
@@ -57,22 +65,26 @@ namespace InaApp.Services
         public async Task<ClienteResponseDTO> CrearAsync(ClienteCreateDTO entity)
         {
 
-            var clienteExistente = await _clienteRepository.ObtenerTodosAsync();
+            var clienteExistente = await _clienteRepository.ObtenerPorCedulaAsync(entity.Cedula);
             if (clienteExistente != null)
             {
-                throw new EntityExistDbException($"El cliente con Id '{entity.Cedula}' ya existe en la base de datos.");
+                throw new EntityExistDbException($"El cliente con cedula '{entity.Cedula}' ya existe en la base de datos.");
             }
 
-            // Enum.IsDefined(entity.TipoCedula) devuelve true si el valor existe en el enum, false si no
-            //lo niego para decir que si el valor no existe en el enum, entonces lanzo la excepcion
-            if (!Enum.IsDefined(entity.TipoCedula))
-            {
-                throw new InvalidEnumException($"El valor '{entity.TipoCedula}' no es un valor válido para el campo TipoCedula del cliente.");
-            }
+           
 
+            //PASO DE DTO A ENTIDAD
+            //LO QUE ESTA ENTRE <> ES EL TIPO DESTINO
+            Cliente clienteNuevo = _mapper.Map<Cliente>(entity);
 
-            var cliente = await _clienteRepository.CrearAsync(new Cliente());
-            return new ClienteResponseDTO();
+            //GUARDO ENTIDAD MAPEADA
+            clienteNuevo = await _clienteRepository.CrearAsync(clienteNuevo);
+
+            //PASO DE ENTIDAD A DTO
+            ClienteResponseDTO clienteResponse = _mapper.Map<ClienteResponseDTO>(clienteNuevo);
+
+            //DEVUELVO EL DTO MAPEADO
+            return clienteResponse;
 
         }
 
@@ -96,15 +108,15 @@ namespace InaApp.Services
                 throw new EntityExistDbException($"El cliente con Id '{entity.Id}' ya existe en la base de datos.");
             }
 
-            // Enum.IsDefined(entity.TipoCedula) devuelve true si el valor existe en el enum, false si no
-            //lo niego para decir que si el valor no existe en el enum, entonces lanzo la excepcion
-            if (!Enum.IsDefined(entity.TipoCedula))
-            {
-                throw new InvalidEnumException($"El valor '{entity.TipoCedula}' no es un valor válido para el campo TipoCedula del cliente.");
-            }
+            
+            //LO QUE ESTA ENTRE <> ES EL TIPO DESTINO
+            Cliente clienteActualizar = _mapper.Map<Cliente>(entity);
 
-            var cliente = await _clienteRepository.ActualizarAsync(new Cliente());
-            return new ClienteResponseDTO();
+            clienteActualizar = await _clienteRepository.ActualizarAsync(clienteActualizar);
+
+            ClienteResponseDTO clienteResponse = _mapper.Map<ClienteResponseDTO>(clienteActualizar);
+
+            return clienteResponse;
         }
 
 

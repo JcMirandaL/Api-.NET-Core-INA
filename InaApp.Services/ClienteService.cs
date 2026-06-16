@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using InaApp.Common.Exceptions;
 using InaApp.Common.Interfaces;
+using InaApp.Common.Response;
 using InaApp.DTOs.ClienteDTOs;
 using InaApp.Entities;
 using InaApp.Repository;
@@ -27,7 +28,7 @@ namespace InaApp.Services
 
 
 
-        public async Task<ClienteResponseDTO> ObtenerPorIdAsync(int id)
+        public async Task<Response<ClienteResponseDTO>> ObtenerPorIdAsync(int id)
         {
             if (id <= 0)
             {
@@ -40,13 +41,16 @@ namespace InaApp.Services
                 throw new NotFoundDbException($"El cliente con Id '{id}' no existe o esta inactivo en la base de datos.");
             }
 
-            var clienteResponse = _mapper.Map<ClienteResponseDTO>(clienteExistente);
-
-            return clienteResponse; 
+            return new Response<ClienteResponseDTO>
+            {
+                Message = ("Cliente encontrado exitosamente:"),
+                Data = _mapper.Map<ClienteResponseDTO>(clienteExistente),
+                Success = true,
+            };
         }
 
            
-        public async Task<List<ClienteResponseDTO>> ObtenerTodosAsync()
+        public async Task<Response<List<ClienteResponseDTO>>> ObtenerTodosAsync()
         {
             var listaClientes = await _clienteRepository.ObtenerTodosAsync();
 
@@ -55,14 +59,17 @@ namespace InaApp.Services
                 throw new NotFoundDbException("No se encontraron clientes activos en la base de datos.");
             }
             
-            var listaClientesResponse = _mapper.Map<List<ClienteResponseDTO>>(listaClientes);
+            return new Response<List<ClienteResponseDTO>>
+            {
+                Message = "Clientes obtenidos exitosamente.",
+                Data = _mapper.Map<List<ClienteResponseDTO>>(listaClientes),
+                Success = true
+            };
 
-            return listaClientesResponse; 
-            
         }
 
 
-        public async Task<ClienteResponseDTO> CrearAsync(ClienteCreateDTO entity)
+        public async Task<Response<ClienteResponseDTO>> CrearAsync(ClienteCreateDTO entity)
         {
 
             var clienteExistente = await _clienteRepository.ObtenerPorCedulaAsync(entity.Cedula);
@@ -80,16 +87,17 @@ namespace InaApp.Services
             //GUARDO ENTIDAD MAPEADA
             clienteNuevo = await _clienteRepository.CrearAsync(clienteNuevo);
 
-            //PASO DE ENTIDAD A DTO
-            ClienteResponseDTO clienteResponse = _mapper.Map<ClienteResponseDTO>(clienteNuevo);
-
-            //DEVUELVO EL DTO MAPEADO
-            return clienteResponse;
+            return new Response<ClienteResponseDTO>
+            {
+                Message = "Cliente creado exitosamente.",
+                Data = _mapper.Map<ClienteResponseDTO>(clienteNuevo),
+                Success = true
+            };
 
         }
 
 
-        public async Task<ClienteResponseDTO> ActualizarAsync(ClienteUpdateDTO entity)
+        public async Task<Response<ClienteResponseDTO>> ActualizarAsync(ClienteUpdateDTO entity)
         {
             
             if (entity.Id <= 0)
@@ -114,13 +122,16 @@ namespace InaApp.Services
 
             clienteActualizar = await _clienteRepository.ActualizarAsync(clienteActualizar);
 
-            ClienteResponseDTO clienteResponse = _mapper.Map<ClienteResponseDTO>(clienteActualizar);
-
-            return clienteResponse;
+            return new Response<ClienteResponseDTO>
+            {
+                Message = "Cliente actualizado exitosamente.",
+                Data = _mapper.Map<ClienteResponseDTO>(clienteActualizar),
+                Success = true
+            };
         }
 
 
-        public async Task<bool> EliminarAsync(int id)
+        public async Task<Response<bool>> EliminarAsync(int id)
         {
             if (id <= 0)
             {
@@ -133,7 +144,12 @@ namespace InaApp.Services
                 throw new NotFoundDbException($"El cliente con Id '{id}' no existe o esta inactivo en la base de datos.");
             }
 
-            return await _clienteRepository.EliminarAsync(id); 
+            return new Response<bool>
+            {
+                Message = "Cliente eliminado exitosamente.",
+                Data = await _clienteRepository.EliminarAsync(id),
+                Success = true
+            };
         }
 
 

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using InaApp.Common.Response;
 
 namespace InaApp.Common.Interfaces
 {
@@ -12,17 +9,17 @@ namespace InaApp.Common.Interfaces
     {
         //definir los metodos que se van a implementar en las clases q usen esta I generica
         //metodo para obtener todos los productos task(asincrono) xq debe esperar la respuesta de la base datos y list xq devuelve una lista
-        Task<List<TResponse>> ObtenerTodosAsync();
+        Task <Response<List<TResponse>>> ObtenerTodosAsync();
 
         //E xq es el nombre q le di al objeto x en cuestion y task(asincrono) xq debe esperar la respuesta
         //de la base datos, el Async solo para q se sepa q ese metod es asincrono
-        Task<TResponse> ObtenerPorIdAsync(int id);
+        Task<Response<TResponse>> ObtenerPorIdAsync(int id);
 
-        Task<TResponse> CrearAsync(TCreate entity);
+        Task<Response<TResponse>> CrearAsync(TCreate entity);
 
-        Task<TResponse> ActualizarAsync(TUpdate entity);
+        Task<Response<TResponse>> ActualizarAsync(TUpdate entity);
 
         //este en vez de E va bool para que debuelva un boleano si se elimino o no el producto
-        Task<bool> EliminarAsync(int id);
+        Task<Response<bool>> EliminarAsync(int id);
     }
 }

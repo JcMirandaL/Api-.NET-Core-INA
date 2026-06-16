@@ -1,13 +1,9 @@
 ﻿//los using son para importar las clases de otros proyectos o librerias
 using InaApp.Common.Interfaces;
 using InaApp.Common.Exceptions;
+using InaApp.Common.Response;
 using InaApp.Entities;
 using InaApp.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using InaApp.DTOs.Producto;
 using AutoMapper;
 
@@ -36,23 +32,26 @@ namespace InaApp.Services
 
 
 
-        public async Task<List<ProductoResponseDTO>> ObtenerTodosAsync()
+        public async Task<Response<List<ProductoResponseDTO>>> ObtenerTodosAsync()
 
         {
             var listaProductos = await _productoRepository.ObtenerTodosAsync();
-
             if (listaProductos is null || listaProductos.Count == 0)
             {
                 throw new NotFoundDbException("No se encontraron productos en la base de datos.");
             }
 
-            var listaProductosResponse = _mapper.Map<List<ProductoResponseDTO>>(listaProductos);
-
-            return listaProductosResponse;
+            return new Response<List<ProductoResponseDTO>>
+            {
+                Message = "Productos obtenidos exitosamente.",
+                //paso de la lista de entidades a una lista de DTOs ya mapeada
+                Data = _mapper.Map<List<ProductoResponseDTO>>(listaProductos),
+                Success = true
+            };
         }
 
 
-        public async Task<ProductoResponseDTO> ObtenerPorIdAsync(int id)
+        public async Task<Response<ProductoResponseDTO>> ObtenerPorIdAsync(int id)
         {
             if (id <= 0)
             {
@@ -69,15 +68,18 @@ namespace InaApp.Services
                 throw new NotFoundDbException($"El producto con Id {id} no existe.");
             }
 
-            //paso de entity a responseDTO, mapea las propiedades con el mismo nombre y tipo de dato, si no son iguales hay que configurar el mapeo en el profile de automapper
-            var productoResponse = _mapper.Map<ProductoResponseDTO>(producto);
-
-            //devuelvo el DTO mapeado con los datos del producto encontrado, el mapeo se encarga de asignar los valores a las propiedades del responseDTO
-            return productoResponse;
+            //retorno un Response con el DTO mapeado, un mensaje y el success en true, el mapeo se encarga de asignar los valores a las propiedades del DTO
+            //Esta estructura Response Esta definida en la carpeta Response de la capa DTOs
+            return new Response<ProductoResponseDTO>
+            {
+                Message = "Producto encontrado exitosamente.",
+                Data = _mapper.Map<ProductoResponseDTO>(producto),
+                Success = true
+            };
         }
 
 
-        public async Task<ProductoResponseDTO> CrearAsync(ProductoCreateDTO entity)
+        public async Task<Response<ProductoResponseDTO>> CrearAsync(ProductoCreateDTO entity)
         {
             var productoExistente = await _productoRepository.ObtenerPorNombreAsync(entity.Nombre);
 
@@ -125,15 +127,19 @@ namespace InaApp.Services
 
             nuevoProducto = await _productoRepository.CrearAsync(nuevoProducto);
 
-            //pasa de entity a responseDTO, mapea las propiedades con el mismo nombre y tipo de dato, si no son iguales hay que configurar el mapeo en el profile de automapper
-            ProductoResponseDTO productoResponse = _mapper.Map<ProductoResponseDTO>(nuevoProducto);
+            return new Response<ProductoResponseDTO>
+            {
+                Message = "Producto creado exitosamente.",
+                // en el Data paso de Entity a Dto ya mapeado
+                Data = _mapper.Map<ProductoResponseDTO>(nuevoProducto),
+                Success = true
+            };
 
-            //retorna el responseDTO con los datos del nuevo producto creado, el mapeo se encarga de asignar los valores a las propiedades del responseDTO
-            return productoResponse;
+
         }
 
 
-        public async Task<ProductoResponseDTO> ActualizarAsync(ProductoUpdateDTO entity)
+        public async Task<Response<ProductoResponseDTO>> ActualizarAsync(ProductoUpdateDTO entity)
         {
             
             if (entity.Id <= 0)
@@ -170,16 +176,18 @@ namespace InaApp.Services
             //actualice con la entidad mapeada
             productoActualizar = await _productoRepository.ActualizarAsync(productoActualizar);
 
-            //paso de entity a responseDTO
-            ProductoResponseDTO productoResponse = _mapper.Map<ProductoResponseDTO>(productoActualizar);
-
-            //devuelvo el DTO mapeado con los datos del producto actualizado
-            return productoResponse;
+            return new Response<ProductoResponseDTO>
+            {
+                Message = "Producto actualizado exitosamente.",
+                // en el Data paso de Entity a Dto ya mapeado
+                Data = _mapper.Map<ProductoResponseDTO>(productoActualizar),
+                Success = true
+            };
         }
 
 
 
-        public async Task<bool> EliminarAsync(int id)
+        public async Task<Response<bool>> EliminarAsync(int id)
         {
             if (id <= 0)
             {
@@ -193,7 +201,12 @@ namespace InaApp.Services
                 throw new NotFoundDbException($"El producto con el Id {id} no existe.");
             }
             
-            return await _productoRepository.EliminarAsync(id);
+            return new Response<bool>
+            {
+                Message = "Producto eliminado exitosamente.",
+                Data = await _productoRepository.EliminarAsync(id),
+                Success = true
+            };
         }
 
       

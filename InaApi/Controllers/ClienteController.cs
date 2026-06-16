@@ -28,9 +28,9 @@ namespace InaApp.Api.Controllers
         {
             try
             {
-                var cliente = await _clienteService.ObtenerPorIdAsync(id);
+                var resCliente = await _clienteService.ObtenerPorIdAsync(id);
 
-                return Ok(cliente);
+                return Ok(resCliente);
 
             }
             catch (NotFoundDbException ex)
@@ -41,9 +41,9 @@ namespace InaApp.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
             }
 
         }
@@ -55,18 +55,18 @@ namespace InaApp.Api.Controllers
         {
             try
             {
-                var listaClientes = await _clienteService.ObtenerTodosAsync();
+                var resListaClientes = await _clienteService.ObtenerTodosAsync();
 
-                return Ok(listaClientes);
+                return Ok(resListaClientes);
 
             }
             catch (NotFoundDbException ex)
             {
                 return NotFound(ex.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             { 
-                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
             }
         }
 
@@ -88,9 +88,9 @@ namespace InaApp.Api.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var result = await _clienteService.CrearAsync(clientedto);
+                var response = await _clienteService.CrearAsync(clientedto);
 
-                return Created("Cliente creado correctamente", result);
+                return Created("Cliente creado correctamente", response);
 
            }
            catch (NotFoundDbException ex)
@@ -109,9 +109,9 @@ namespace InaApp.Api.Controllers
            {
                 return BadRequest(ex.Message);
            }
-           catch (Exception ex)
+           catch (Exception)
            {
-                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
            }
         }
 
@@ -132,9 +132,9 @@ namespace InaApp.Api.Controllers
                     return BadRequest(ModelState);
                 }
 
-                await _clienteService.ActualizarAsync(clienteDTO);
+                var respose = await _clienteService.ActualizarAsync(clienteDTO);
 
-                return Ok("Cliente actualizado correctamente");
+                return Ok(respose);
 
             }
             catch (NotFoundDbException ex)
@@ -153,9 +153,9 @@ namespace InaApp.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
 
             }
         }
@@ -168,9 +168,9 @@ namespace InaApp.Api.Controllers
         {
             try
             {
-                await _clienteService.EliminarAsync(id);
+                var response = await _clienteService.EliminarAsync(id);
 
-                return Ok("Cliente eliminado correctamente");
+                return Ok(response);
 
             }
             catch (NotNumberPositiveException ex)
@@ -181,9 +181,9 @@ namespace InaApp.Api.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, "Error en el servidor. Contacte con el administrador" + ex.Message);
+                return StatusCode(500, "Error en el servidor. Contacte con el administrador");
             }
         }
     }

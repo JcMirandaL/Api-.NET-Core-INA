@@ -1,8 +1,8 @@
 ﻿using InaApp.Common.Interfaces;
 using InaApp.Data;
+using InaApp.DTOs.CategoriaDTOs;
 using InaApp.DTOs.ClienteDTOs;
 using InaApp.DTOs.Producto;
-using InaApp.Entities;
 using InaApp.Repository;
 using InaApp.Services;
 using InaApp.Services.Mapping;
@@ -39,6 +39,7 @@ namespace InaApp.Api.Extensions
             //defino las inyeccion de dependencias
             services.AddScoped<IGenericService<ProductoResponseDTO, ProductoCreateDTO, ProductoUpdateDTO>, ProductoService>();
             services.AddScoped<IGenericService<ClienteResponseDTO, ClienteCreateDTO, ClienteUpdateDTO>, ClienteService>();
+            services.AddScoped<IGenericService<CategoriaResponseDTO, CategoriaCreateDTO, CategoriaUpdateDTO>, CategoriaSerrvice>();
 
 
 
@@ -47,6 +48,7 @@ namespace InaApp.Api.Extensions
             //xq el repo de producto tiene metodos propios, entonces no puedo usar el tipado de IGenericRepository
             services.AddScoped<ProductoRepository>();
             services.AddScoped<ClienteRepository>();
+            services.AddScoped<CategoriaRepository>();
 
 
             return services;

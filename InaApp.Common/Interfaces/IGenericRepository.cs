@@ -14,7 +14,7 @@ namespace InaApp.Common.Interfaces
 
         //E xq es el nombre q le di al objeto x en cuestion y task(asincrono) xq debe esperar la respuesta
         //de la base datos, el Async solo para q se sepa q ese metod es asincrono
-        Task<E> ObtenerPorIdAsync(int id);
+        Task<E?> ObtenerPorIdAsync(int id);
 
         //Task<E> ObtenerPorNombreAsync(string nombre);
 

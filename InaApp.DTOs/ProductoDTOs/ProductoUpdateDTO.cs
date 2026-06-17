@@ -5,9 +5,13 @@ namespace InaApp.DTOs.Producto
 {
     public class ProductoUpdateDTO
     {
-        [Required(ErrorMessage = "El Id es un campo obligatorio.")]
-        [Range(1, int.MaxValue, ErrorMessage = "El Id debe ser un numero positivo.")]
+        [Required(ErrorMessage = "El Id del producto es un campo obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El Id del producto debe ser un numero positivo.")]
         public int Id { get; set; }
+
+        [Required(ErrorMessage = "El Id de la categoria es obligatorio")]
+        [Range(1, int.MaxValue, ErrorMessage = "El Id de la categoria debe ser un numero positivo.")]
+        public int CategoriaId { get; set; }
 
         //get set es una propiedad de acceso que permite obtener o establecer el valor de una propiedad
         [Required(ErrorMessage = "El nombre es un campo obligatorio.")]

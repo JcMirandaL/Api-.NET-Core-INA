@@ -20,7 +20,10 @@ namespace InaApp.Entities
         //propiedades = variables o atributos de una clase/objeto
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; } 
+        public int Id { get; set; }
+
+        [Required (ErrorMessage = "Campo obligatorio.")]
+        public int CategoriaId { get; set; } //FK
 
         //get set es una propiedad de acceso que permite obtener o establecer el valor de una propiedad
         [Required (ErrorMessage = "El nombre es un campo obligatorio.")]
@@ -51,6 +54,12 @@ namespace InaApp.Entities
 
         [Required(ErrorMessage = "Campo obligatorio.")]
         public string UsuarioCreacion { get; set; } = "admin";
+
+
+        //relacion de 1 : N, 1 categoria : muchos productos
+        //el ! en el null es para indicar que esta propiedad no puede ser null, es decir, que siempre debe tener un valor asignado, esto es necesario porque la propiedad Categoria es de tipo referencia y puede ser null, pero al poner el ! le decimos al compilador que no va a ser null
+        //y que siempre va a tener un valor asignado, esto es importante para evitar errores de null reference exception en tiempo de ejecucion
+        public Categoria Categoria { get; set; } = null!;
 
 
 

@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
+using InaApp.DTOs.CategoriaDTOs;
 using InaApp.DTOs.ClienteDTOs;
 using InaApp.DTOs.Producto;
 using InaApp.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace InaApp.Services.Mapping
 {
@@ -19,16 +16,19 @@ namespace InaApp.Services.Mapping
             //DTO CREATE A ENTITY
             CreateMap<ProductoCreateDTO, Producto>();
             CreateMap<ClienteCreateDTO, Cliente>();
+            CreateMap<CategoriaCreateDTO, Categoria>();
 
 
             //DTO UPDATE A ENTITY
             CreateMap<ProductoUpdateDTO, Producto>();
             CreateMap<ClienteUpdateDTO, Cliente>();
-            
+            CreateMap<CategoriaUpdateDTO, Categoria>();
+
 
             //ENTITY A DTO RESPONSE
             CreateMap<Producto, ProductoResponseDTO>();
             CreateMap<Cliente, ClienteResponseDTO>();
+            CreateMap<Categoria, CategoriaResponseDTO>();
         }
 
 

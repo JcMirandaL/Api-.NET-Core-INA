@@ -1,10 +1,8 @@
 ﻿using InaApp.Common.Exceptions;
 using InaApp.Common.Interfaces;
 using InaApp.DTOs.Producto;
-using InaApp.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+
 
 namespace InaApp.Api.Controllers
 {

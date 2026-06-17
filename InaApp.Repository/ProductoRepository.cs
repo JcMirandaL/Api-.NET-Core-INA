@@ -2,11 +2,7 @@
 using InaApp.Data;
 using InaApp.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace InaApp.Repository
 {
@@ -24,12 +20,15 @@ namespace InaApp.Repository
         }
          
 
-        public async Task<Producto> ObtenerPorIdAsync(int id)
+        public async Task<Producto?> ObtenerPorIdAsync(int id)
         {
             //variable para al;macenar la entity q devuelve la base datos
             //AsNoTracking() se utiliza para indicar que no se va a realizar un seguimiento de los cambios en la entidad,
             //esto mejora el rendimiento cuando solo se necesita leer los datos sin modificarlos
-            return await _context.Productos.AsNoTracking()
+            return await _context.Productos
+                //include trae toda la entidad y tambien se puede usar select para traer solo los campo que se necesita
+                .Include(x => x.Categoria)
+                .AsNoTracking()
                 .Where(x => x.Id == id && x.Estado == true)
                 .SingleOrDefaultAsync();
 
@@ -41,8 +40,11 @@ namespace InaApp.Repository
         {
             //utilizo el contexto para acceder a la tabla de productos y traigo todos los productos de la base de datos, lo convierto a una listaaSINCRONA y lo retorno
             //expresion lanbda para filtrar los productos por estado, solo traigo los productos que esten activos (estado=true)
-            return await _context.Productos.AsNoTracking()
-                .Where(x => x.Estado == true).ToListAsync();
+            return await _context.Productos
+                .Include(x => x.Categoria)
+                .AsNoTracking()
+                .Where(x => x.Estado == true)
+                .ToListAsync();
         }
 
 
@@ -68,20 +70,14 @@ namespace InaApp.Repository
         }
 
         
-        public async Task<bool> EliminarAsync(int id)
+        public Task<bool> EliminarAsync(int id)
         {
-            var producto = await ObtenerPorIdAsync(id);
-
-            producto.Estado = false; // Cambia el estado a false para marcarlo como eliminado
-
-            _context.Productos.Update(producto);// Actualiza el producto en el contexto
-            await _context.SaveChangesAsync(); // Guarda los cambios en la base de datos
-            return true;// Retorna true si la eliminación fue exitosa
+            throw new NotImplementedException();
         }
 
 
 
-        public async Task<Producto> ObtenerPorNombreAsync(string nombre)
+        public async Task<Producto?> ObtenerPorNombreAsync(string nombre)
         {
             //el AsNoTracking() se utiliza para indicar que no se va a realizar un seguimiento de los cambios en la entidad,
             //esto mejora el rendimiento cuando solo se necesita leer los datos sin modificarlos

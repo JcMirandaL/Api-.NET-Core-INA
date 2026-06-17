@@ -43,7 +43,7 @@ namespace InaApp.Services
 
             return new Response<List<ProductoResponseDTO>>
             {
-                Message = "Productos obtenidos exitosamente.",
+                Message = "Productos obtenidos exitosamente: ",
                 //paso de la lista de entidades a una lista de DTOs ya mapeada
                 Data = _mapper.Map<List<ProductoResponseDTO>>(listaProductos),
                 Success = true
@@ -65,14 +65,14 @@ namespace InaApp.Services
             {
                 //exception personalizada y le paso el string template como poarametro
                 //string tmplate = enacdenar texto sin concatenar con el + 
-                throw new NotFoundDbException($"El producto con Id {id} no existe.");
+                throw new NotFoundDbException($"El producto con Id '{id}' no existe.");
             }
 
             //retorno un Response con el DTO mapeado, un mensaje y el success en true, el mapeo se encarga de asignar los valores a las propiedades del DTO
             //Esta estructura Response Esta definida en la carpeta Response de la capa DTOs
             return new Response<ProductoResponseDTO>
             {
-                Message = "Producto encontrado exitosamente.",
+                Message = "Producto encontrado exitosamente: ",
                 Data = _mapper.Map<ProductoResponseDTO>(producto),
                 Success = true
             };
@@ -129,7 +129,7 @@ namespace InaApp.Services
 
             return new Response<ProductoResponseDTO>
             {
-                Message = "Producto creado exitosamente.",
+                Message = "Producto creado exitosamente: ",
                 // en el Data paso de Entity a Dto ya mapeado
                 Data = _mapper.Map<ProductoResponseDTO>(nuevoProducto),
                 Success = true
@@ -178,7 +178,7 @@ namespace InaApp.Services
 
             return new Response<ProductoResponseDTO>
             {
-                Message = "Producto actualizado exitosamente.",
+                Message = "Producto actualizado exitosamente: ",
                 // en el Data paso de Entity a Dto ya mapeado
                 Data = _mapper.Map<ProductoResponseDTO>(productoActualizar),
                 Success = true
@@ -200,11 +200,15 @@ namespace InaApp.Services
             {
                 throw new NotFoundDbException($"El producto con el Id {id} no existe.");
             }
-            
+
+            producto.Estado = false;
+
+            await _productoRepository.ActualizarAsync(producto);
+
             return new Response<bool>
             {
                 Message = "Producto eliminado exitosamente.",
-                Data = await _productoRepository.EliminarAsync(id),
+                Data = true,
                 Success = true
             };
         }

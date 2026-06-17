@@ -10,6 +10,10 @@ namespace InaApp.DTOs.Producto
 {
     public class ProductoCreateDTO
     {
+        [Required (ErrorMessage = "El Id de la categoria es obligatorio")]
+        [Range(1, int.MaxValue, ErrorMessage = "El Id de la categoria debe ser un numero positivo.")]
+        public int CategoriaId { get; set; }
+
         //get set es una propiedad de acceso que permite obtener o establecer el valor de una propiedad
         [Required(ErrorMessage = "El nombre es un campo obligatorio.")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 100 caracteres.")]

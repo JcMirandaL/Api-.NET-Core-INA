@@ -30,5 +30,27 @@ namespace InaApp.Data
         public DbSet<Producto> Productos { get; set; }
 
         public DbSet<Cliente> Clientes { get; set; }
+
+        public DbSet<Categoria> Categorias { get; set; }
+
+
+
+        //el fluet api es una forma de configurar el modelo de datos utilizando el metodo OnModelCreating,
+        //que se ejecuta cuando se crea el modelo de datos, y permite configurar las entidades, las relaciones, las restricciones(check, unique, constraint, etc)
+        //aquello que no se puede definir con el dataAnnotations se puede configurar con el fluent api, por ejemplo
+        //la configuracion de un indice unico en el campo 'Nombre' de la entidad Producto, o FK, etc
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            //llama al metodo base para que se ejecute la configuracion por defecto del modelo de datos,
+            base.OnModelCreating(modelBuilder);
+
+            //relacion de 1 : N, 1 categoria : muchos productos
+            modelBuilder.Entity<Producto>()
+                .HasOne(p => p.Categoria)//1 producto tiene 1 categoria
+                .WithMany(c => c.Productos)//1 categoria tiene muchos productos
+                .HasForeignKey(p => p.CategoriaId);//la FK es el campo CategoriaId de la entidad Producto
+        }
+
+
     }
 }

@@ -14,6 +14,7 @@ namespace InaApp.Services
     {
         //variable guarda instancia del repo, del tipo de la clase 'ProductoRepository, el nombre con _ para indicar que es una variable privada
         private readonly ProductoRepository _productoRepository;
+        private readonly CategoriaRepository _categoriaRepository;
         //variable para inyectar mapper
         private readonly IMapper _mapper;
 
@@ -22,10 +23,11 @@ namespace InaApp.Services
         //se usa para inicializar las variables o propiedades de la clase
         //para inyectar hay que definir la inyaccion en el program.cs, en este caso se inyecta el repo con su interface para que se pueda usar en el service
         //x parametro llega la instancia del repo que se inyecto en el program.cs, y se le asigna a la variable privada para poder usarla en los metodos del repo
-        public ProductoService(ProductoRepository productoRepository, IMapper mapper)
+        public ProductoService(ProductoRepository productoRepository, CategoriaRepository categoriaRepository, IMapper mapper)
         {
             //asigno a la variable privada la instancia que me llego por el param, detro del constructor para poder usarla en los metodos del repo
             _productoRepository = productoRepository;
+            _categoriaRepository = categoriaRepository;
             _mapper = mapper;
         }
 
@@ -82,20 +84,25 @@ namespace InaApp.Services
         public async Task<Response<ProductoResponseDTO>> CrearAsync(ProductoCreateDTO entity)
         {
             var productoExistente = await _productoRepository.ObtenerPorNombreAsync(entity.Nombre);
-
             if (productoExistente != null) 
             { 
                 throw new EntityExistDbException($"El producto con nombre '{entity.Nombre}' ya existe en la base de datos.");
             }
 
+            var categoriaExistente = await _categoriaRepository.ObtenerPorIdAsync(entity.CategoriaId);
+            if (categoriaExistente == null)
+            {
+                throw new NotFoundDbException($"No se puede crear productos con uan categoria inexistente. Categoria ingresada {entity.CategoriaId}.");
+            }
+
             if (entity.Stock <= 0)
             {
-                throw new NotNumberPositiveException($"El stock debe ser mayor a 0. Stock Ingresado: {entity.Stock}");
+                throw new NotNumberPositiveException($"El stock debe ser mayor a 0. Stock Ingresado: {entity.Stock}.");
             }
 
             if (entity.Precio <= 0)
             {
-                throw new NotNumberPositiveException($"El precio debe ser mayor a 0. Precio Ingresado: {entity.Precio}");
+                throw new NotNumberPositiveException($"El precio debe ser mayor a 0. Precio Ingresado: {entity.Precio}.");
             }
 
             //creo una nueva instancia de producto y le asigno los valores que llegan por el parametro, para luego pasarla al repo y guardarla en la base de datos
@@ -127,6 +134,10 @@ namespace InaApp.Services
 
             nuevoProducto = await _productoRepository.CrearAsync(nuevoProducto);
 
+            //actualizo la categoria del producto con la categoria existente
+            //esto para que cargue el nombrte de la categoria en el DTO de respuesta y no usar include en el repo(create-actualizar)
+            nuevoProducto.Categoria = categoriaExistente;
+
             return new Response<ProductoResponseDTO>
             {
                 Message = "Producto creado exitosamente: ",
@@ -148,9 +159,15 @@ namespace InaApp.Services
             }
             
             var productoExistente = await _productoRepository.ObtenerPorIdAsync(entity.Id);
-            if (productoExistente == null)
+            if (productoExistente is null)
             {
                 throw new NotFoundDbException($"El prodcuto con Id '{entity.Id}' no existe o esta inactivo.");
+            }
+
+            var categoriaExistente = await _categoriaRepository.ObtenerPorIdAsync(entity.CategoriaId);
+            if (categoriaExistente is null)
+            {
+                throw new NotFoundDbException($"No se puede actualizar el producto con una categoria inexistente. Categoria ingresada {entity.CategoriaId}.");
             }
 
             var nombreExistente = await _productoRepository.ObtenerPorNombreAsync(entity.Nombre);
@@ -158,6 +175,7 @@ namespace InaApp.Services
             {
                 throw new EntityExistDbException($"El producto con nombre '{entity.Nombre}' ya existe en la base de datos.");
             }
+
 
             if (entity.Stock < 0)
             {
@@ -175,6 +193,10 @@ namespace InaApp.Services
 
             //actualice con la entidad mapeada
             productoActualizar = await _productoRepository.ActualizarAsync(productoActualizar);
+
+            //actualizo la categoria del producto con la categoria existente
+            //esto para que cargue el nombrte de la categoria en el DTO de respuesta y no usar include en el repo(create-actualizar)
+            productoActualizar.Categoria = categoriaExistente;
 
             return new Response<ProductoResponseDTO>
             {

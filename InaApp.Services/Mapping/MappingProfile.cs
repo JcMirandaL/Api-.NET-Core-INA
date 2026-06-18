@@ -26,13 +26,7 @@ namespace InaApp.Services.Mapping
 
 
             //ENTITY A DTO RESPONSE
-            CreateMap<Producto, ProductoResponseDTO>()
-                //el formember se utiliza para mapeo de una propiedad específica, en este caso
-                //se mapea la propiedad CategoriaNombre del DTO ProductoResponseDTO con el nombre de la
-                //categoria que esta dentro de la entidad producto, xq en el getById y GetAll no da problemas
-                //pero en create y update si manda CategoriaNombre null xq en el repo no tienen el include de categoria
-                .ForMember(destiny => destiny.CategoriaNombre, //expresion lambda
-                options => options.MapFrom(origin => origin.Categoria.Nombre));
+            CreateMap<Producto, ProductoResponseDTO>();
             CreateMap<Cliente, ClienteResponseDTO>();
             CreateMap<Categoria, CategoriaResponseDTO>();
         }

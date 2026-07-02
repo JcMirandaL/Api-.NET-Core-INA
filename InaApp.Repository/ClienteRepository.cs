@@ -24,7 +24,7 @@ namespace InaApp.Repository
 
 
         //crud
-        public async Task<Cliente> ObtenerPorIdAsync(int id)
+        public async Task<Cliente?> ObtenerPorIdAsync(int id)
         {
             return await _context.Clientes.AsNoTracking()
                 .Where(x => x.Id == id && x.Estado == true)

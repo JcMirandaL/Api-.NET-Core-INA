@@ -1,0 +1,45 @@
+﻿@using InaApp.ProyectoInaApp.Models.Categoria
+
+
+@model CategoriaEditViewModel
+@{
+    ViewData["Title"] = "Modificar Categoria";
+}
+
+
+<div class="container mt-4">
+
+    <h2>Modificar Categoria</h2>
+
+    <!--es un post xq los form de html solo acepta metodos get y post-->
+    <form asp-action="Edit" method="post">
+
+        <div class="alert alert-warning mt-3">
+            <strong>Advertencia:</strong>
+            <p>¿Está seguro que desea modificar la categoria: @Model.Nombre?</p>
+        </div>
+
+        <!--Id oculto-->
+        <input asp-for="Id" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Nombre" class="form-label"></label>
+            <input asp-for="Nombre" class="form-control" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success mt-3">
+            Guardar cambios
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary mt-3">
+            Cancelar
+        </a>
+    </form>
+</div>
+
+<!--Super importante para que se puedan hacer las validaciones del dataAnotations-->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

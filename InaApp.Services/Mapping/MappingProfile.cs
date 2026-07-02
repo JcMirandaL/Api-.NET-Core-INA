@@ -29,6 +29,7 @@ namespace InaApp.Services.Mapping
             CreateMap<Producto, ProductoResponseDTO>();
             CreateMap<Cliente, ClienteResponseDTO>();
             CreateMap<Categoria, CategoriaResponseDTO>();
+
         }
 
 

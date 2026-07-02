@@ -1,0 +1,36 @@
+﻿@using InaApp.ProyectoInaApp.Models.Categoria
+
+
+@model CategoriaCreateViewModel
+@{
+    ViewData["Title"] = "Crear Categoria";
+}
+
+
+<h2>Crear Categoria</h2>
+
+<form asp-action="Create" method="post">
+
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    
+
+    <!--cunado le dan suit va al metodo post del create dfel contyroller-->
+    <button type="submit" class="btn btn-success">
+        Guardar
+    </button>
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>
+
+<!--Esto es super importante para validar los datos del viewModel con el DataAnotations-->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+

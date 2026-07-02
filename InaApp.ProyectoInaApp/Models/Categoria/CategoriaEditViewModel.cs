@@ -1,11 +1,8 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-
-
-namespace InaApp.DTOs.CategoriaDTOs
+namespace InaApp.ProyectoInaApp.Models.Categoria
 {
-    public class CategoriaUpdateDTO
+    public class CategoriaEditViewModel
     {
         [Required(ErrorMessage = "El Id es un campo obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El Id debe ser un numero positivo.")]

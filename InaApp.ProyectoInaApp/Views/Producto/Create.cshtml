@@ -1,0 +1,62 @@
+﻿@using InaApp.ProyectoInaApp.Models.Producto
+
+
+@model ProductoCreateViewModel
+@{
+    ViewData["Title"] = "Crear Producto"; 
+}
+
+
+<h2>Crear Producto</h2>
+
+<form asp-action="Create" method="post">
+    
+    <div class="mb-3">
+        <label asp-for="CategoriaId" class="form-label"></label>
+        <select asp-for="CategoriaId" class="form-select" asp-items="@Model.Categorias"></select>
+        <span asp-validation-for="CategoriaId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    
+    <div class="mb-3">
+        <label asp-for="Precio" class="form-label"></label>
+        <input asp-for="Precio" class="form-control" />
+        <span asp-validation-for="Precio" class="text-danger"></span>
+    </div>
+    
+    <div class="mb-3">
+        <label asp-for="Stock" class="form-label"></label>
+        <input asp-for="Stock" class="form-control" />
+        <span asp-validation-for="Stock" class="text-danger"></span>
+    </div>
+    
+    <div class="mb-3">
+        <!--Este es para el nombre de la etiqueta que le puse al moderl con el display(dataAnotations)-->
+        <label asp-for="Descripcion" class="form-label"></label>
+        <!--Este es el nombre del atributo tiene que ser igual al del viewModel-->
+        <textarea asp-for="Descripcion" class="form-control"></textarea>
+        <!--Este span unicamente pinta el msj de error, pero sin el section Scripts de abajo no funciona-->
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+
+
+    <!--cunado le dan suit va al metodo post del create dfel contyroller-->
+    <button type="submit" class="btn btn-success">
+        Guardar
+    </button>
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>
+
+<!--Esto es super importante para validar los datos del viewModel con el DataAnotations-->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+

@@ -196,6 +196,12 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //.Data es xq los datos vienen encapsulados en un objeto de tipo ResponseDTO,
                 var productoEditVM = _mapper.Map<ProductoEditViewModel>(product.Data);
 
+                //obtengo todas la categorias
+                var categorias = await _categoriaService.ObtenerTodosAsync();
+
+                //asigno las categorias a la propiedad del viewModel para que se puedan mostrar en la vista en el select
+                productoEditVM.Categorias = new SelectList(categorias.Data, "Id", "Nombre");
+
                 //pasamos el producto ya mapeada(model) a la vista para mostrar en la interfaz de usuario
                 return View(productoEditVM);
             }
@@ -220,6 +226,12 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //para validar que los datos ingresados en el formulario cumplan con las reglas de validación definidas en el modelo de vista (ViewModel).DataAnotations
                 if (!ModelState.IsValid)
                 {
+                    //obetngo las categorias
+                    var categorias = await _categoriaService.ObtenerTodosAsync();
+
+                    //asigno las categorias a la propiedad del viewModel para que se puedan mostrar en la vista en el select
+                    productoEditVM.Categorias = new SelectList(categorias.Data, "Id", "Nombre");
+
                     //si no devuelva la vista con los datos ingresados para que el usuario pueda corregirlos
                     return View(productoEditVM);
                 }
@@ -234,6 +246,12 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //si el servicio devuelve un error, agrego un mensaje de error al ModelState y devuelvo la vista con los datos ingresados para que el usuario pueda corregirlos
                 if (!response.Success)
                 {
+                    //obetngo las categorias
+                    var categorias = await _categoriaService.ObtenerTodosAsync();
+
+                    //asigno las categorias a la propiedad del viewModel para que se puedan mostrar en la vista en el select
+                    productoEditVM.Categorias = new SelectList(categorias.Data, "Id", "Nombre");
+
                     ModelState.AddModelError(string.Empty, response.Message);
                     return View(productoEditVM);
                 }

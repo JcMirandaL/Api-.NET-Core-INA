@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace InaApp.ProyectoInaApp.Models.Producto
 
@@ -11,7 +12,10 @@ namespace InaApp.ProyectoInaApp.Models.Producto
 
         [Required(ErrorMessage = "La categoria Id es un campo obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "La categoria Id debe ser un numero positivo.")]
-        public int CategoriaId { get; set; } 
+        public int CategoriaId { get; set; }
+
+        public SelectList? Categorias { get; set; }
+
 
         //el display name es el nombre que se mostrara en la vista
         [Display(Name = "Nombre del producto")]

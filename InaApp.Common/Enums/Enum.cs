@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using System.ComponentModel.DataAnnotations;
+
 
 namespace InaApp.Common.Enums
 {
@@ -11,13 +9,17 @@ namespace InaApp.Common.Enums
     public static class Enumeradores { 
          
         public enum TipoCedulaEnum
-            {
+        {
+            [Display(Name = "Cedula Nacional")]
             Nacional = 1,
+
+            [Display(Name = "Cedula Juridica")]
             Juridica = 2,
+
             Dimex = 3,
             //nite es un tipo de cedula que se le asigna a las empresas extranjeras que operan en Costa Rica,
-        //es un numero unico que se utiliza para identificarlas y para realizar transacciones comerciales(tributarias),
-        //formato comienza con la letra N seguida de numero de 8 digitos #, por ejemplo: N12345678
+            //es un numero unico que se utiliza para identificarlas y para realizar transacciones comerciales(tributarias),
+            //formato comienza con la letra N seguida de numero de 8 digitos #, por ejemplo: N12345678
             NITE = 4,
             Pasaporte = 5
         }

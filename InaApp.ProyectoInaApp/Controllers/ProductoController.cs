@@ -297,7 +297,7 @@ namespace InaApp.ProyectoInaApp.Controllers
         [ValidateAntiForgeryToken]
         //el nombre de los metodos delete son diferentes xq ambos tienen la misma firma i parametros, hay q diferenciarlos
         public async Task<ActionResult> DeleteConfirmedAsync(int id)
-        {
+        {  
             try
             {
                 //llamo service eliminar y le paso el id del producto a eliminar

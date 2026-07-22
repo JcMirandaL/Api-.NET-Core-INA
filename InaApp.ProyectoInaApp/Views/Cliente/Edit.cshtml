@@ -1,0 +1,91 @@
+﻿@using InaApp.ProyectoInaApp.Models.Cliente
+@using static InaApp.Common.Enums.Enumeradores
+
+
+@model ClienteEditViewModel
+@{
+    ViewData["Title"] = "Modificar Cliente";
+}
+
+
+<div class="container mt-4">
+
+    <h2>Modificar Cliente</h2>
+
+    <form asp-action="Edit" method="post">
+        <!--Esta linea es para mostrar errores generales cuando no pasa la valuiadcion de if(!response.Success) addModelError en el p[ost de edit -->
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <!--campos oculto-->
+        <input asp-for="Id" type="hidden" />
+
+        <div class="mb-3">
+            <label asp-for="Cedula" class="form-label"></label>
+            <input asp-for="Cedula" class="form-control" />
+            <span asp-validation-for="Cedula" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="TipoCedula" class="form-label"></label>
+
+            <!--El html.getEnum es para jalar el enum y se muestre en el select-->
+            <select asp-for="TipoCedula"
+                    asp-items="Html.GetEnumSelectList<TipoCedulaEnum>()"
+                    class="form-select">
+                <option value="">Seleccione un tipo</option>
+            </select>
+
+            <span asp-validation-for="TipoCedula" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Nombre" class="form-label"></label>
+            <input asp-for="Nombre" class="form-control"  />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Apellido1" class="form-label"></label>
+            <input asp-for="Apellido1" class="form-control" />
+            <span asp-validation-for="Apellido1" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Apellido2" class="form-label"></label>
+            <input asp-for="Apellido2" class="form-control" />
+            <span asp-validation-for="Apellido2" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Correo" class="form-label"></label>
+            <input asp-for="Correo" class="form-control" />
+            <span asp-validation-for="Correo" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Telefono" class="form-label"></label>
+            <input asp-for="Telefono" class="form-control" />
+            <span asp-validation-for="Telefono" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="FechaNacimiento" class="form-label"></label>
+            <input asp-for="FechaNacimiento" class="form-control" />
+            <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+        </div>
+
+
+        <button type="submit" class="btn btn-success mt-3">
+            Guardar cambios
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary mt-3">
+            Cancelar
+        </a>
+    </form>
+</div>
+
+<!--Super importante para que se puedan hacer las validaciones del dataAnotations-->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

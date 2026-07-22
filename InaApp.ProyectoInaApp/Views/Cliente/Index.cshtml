@@ -1,0 +1,88 @@
+﻿@using InaApp.ProyectoInaApp.Models.Cliente
+
+
+<!--el import no hace falta xq ya esta en el archivo _ViewImports.cshtml
+    Esto para usar el modelo de vista ProductoIndexViewModel que es el que se va a usar en la vista-->
+@model List<ClienteIndexViewModel>
+
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<!--Tabla de bootstrap-->
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Listado de Clientes</h2>
+
+        <!--El asp-action es para decirle a que vista ir en este caso CREATE-->
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle-fill"></i> Nuevo Cliente
+        </a>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Id</th>
+                <th>Cedula</th>
+                <th>Tipo de Cedula</th>
+                <th>Nombre</th>
+                <th>Apellido 1</th>
+                <th>Apellido 2</th>
+                <th>Correo</th>
+                <th>Telefono</th>
+                <th>Fecha de Nacimiento</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var cliente in Model)
+                {
+                    <tr>
+                        <td>@cliente.Id</td>
+                        <td>@cliente.Nombre</td>
+                        <td>@cliente.Cedula</td>
+                        <td>@cliente.TipoCedula</td>
+                        <td>@cliente.Apellido1</td>
+                        <td>@cliente.Apellido2</td>
+                        <td>@cliente.Correo</td>
+                        <td>@cliente.Telefono</td>
+                        <td>@cliente.FechaNacimiento</td>
+                        <td class="text-center">
+                            <a asp-action="Details"
+                               asp-route-id="@cliente.Id"
+                               class="btn btn-info btn-sm my-1">
+                                Detalles
+                            </a>
+
+                            <!--Este es el metodo Edit del controllador y cargue la vista-->
+                            <!--con el asp-route-id le paso el parametro-->
+                            <a asp-action="Edit"
+                               asp-route-id="@cliente.Id"
+                               class="btn btn-warning btn-sm my-1">
+                                Modificar
+                            </a>
+                            <a asp-action="Delete"
+                               asp-route-id="@cliente.Id"
+                               class="btn btn-danger btn-sm my-1">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center">
+                        No existen clientes registrados.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

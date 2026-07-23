@@ -123,6 +123,7 @@ namespace InaApp.Services
                     Precio = productoExist.Precio
                 };
 
+
                 //agrego el detalle a la factura
                 nuevaFactura.Detalles.Add(detalleFactura);
 
@@ -153,7 +154,12 @@ namespace InaApp.Services
             var responseDTO = _mapper.Map<FacturaResponseDTO>(nuevaFactura);
             responseDTO.Subtotal = subtotal;
             responseDTO.Total = total;
-                            
+
+            //actualizo el subtotal de cada detalle de la factura en el DTO de respuesta
+            foreach (var detalle in responseDTO.Detalles)
+            {
+                detalle.Subtotal = detalle.Cantidad * detalle.Precio;
+            }
 
             return new Response<FacturaResponseDTO>
             {

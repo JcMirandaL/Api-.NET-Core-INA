@@ -14,5 +14,7 @@ namespace InaApp.DTOs.DetalleFacturaDTOs
         public int Cantidad { get; set; }
 
         public decimal Precio { get; set; }
+
+        public decimal Subtotal { get; set; }
     }
 }

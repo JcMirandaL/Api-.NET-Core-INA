@@ -1,10 +1,6 @@
 ﻿using InaApp.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 
 //la capa data es para manejar todo lo relacionado con la base de datos, como las entidades,
@@ -32,6 +28,10 @@ namespace InaApp.Data
         public DbSet<Cliente> Clientes { get; set; }
 
         public DbSet<Categoria> Categorias { get; set; }
+         
+        public DbSet<Factura> Factura { get; set; }
+
+        public DbSet<DetalleFactura> DetalleFactura { get; set; }
 
 
 
@@ -44,13 +44,41 @@ namespace InaApp.Data
             //llama al metodo base para que se ejecute la configuracion por defecto del modelo de datos,
             base.OnModelCreating(modelBuilder);
 
+
+            //---------------------------PRODUCTO/CATEGORIA-----------------------------//
             //relacion de 1 : N, 1 categoria : muchos productos
             modelBuilder.Entity<Producto>()
                 .HasOne(p => p.Categoria)//1 producto tiene 1 categoria
                 .WithMany(c => c.Productos)//1 categoria tiene muchos productos
                 .HasForeignKey(p => p.CategoriaId);//la FK es el campo CategoriaId de la entidad Producto
-        }
 
+
+            //---------------------------FACTURA/CLIENTE-----------------------------//
+            //relacion de 1 : N, 1 cliente muchas facturas
+            modelBuilder.Entity<Factura>()
+                .HasOne(f => f.Cliente)//1 factura tiene 1 cliente
+                .WithMany(c => c.Facturas)//1 cliente tiene muchass facturas
+                .HasForeignKey(f => f.ClienteId);//FK
+
+
+            //-------------------DETALLES FACTURA/PRODUCTO Y FACTURTA-----------------------------//
+            //PK COMPUESTA
+            modelBuilder.Entity<DetalleFactura>()
+                .HasKey(d => new { d.FacturaId, d.ProductoId });//Pk COMPUESTA
+
+            //relacion de 1 : N, 1 factura muchos detalles
+            modelBuilder.Entity<DetalleFactura>()
+                .HasOne(d => d.Factura)
+                .WithMany(f => f.Detalles)
+                .HasForeignKey(d => d.FacturaId);
+
+            //relacion de 1 : N, 1 producto muchos detalles
+            modelBuilder.Entity<DetalleFactura>()
+                .HasOne(d => d.Producto)
+                .WithMany(p => p.Detalles)
+                .HasForeignKey(d => d.ProductoId);
+
+        }
 
     }
 }

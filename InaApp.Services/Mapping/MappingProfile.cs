@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using InaApp.DTOs.CategoriaDTOs;
 using InaApp.DTOs.ClienteDTOs;
+using InaApp.DTOs.DetalleFacturaDTOs;
+using InaApp.DTOs.FacturaDTOs;
 using InaApp.DTOs.Producto;
 using InaApp.Entities;
 
@@ -17,6 +19,8 @@ namespace InaApp.Services.Mapping
             CreateMap<ProductoCreateDTO, Producto>();
             CreateMap<ClienteCreateDTO, Cliente>();
             CreateMap<CategoriaCreateDTO, Categoria>();
+            CreateMap<FacturaCreateDTO, Factura>();
+            CreateMap<DetalleFacturaCreateDTO, DetalleFactura>();
 
 
             //DTO UPDATE A ENTITY
@@ -29,6 +33,9 @@ namespace InaApp.Services.Mapping
             CreateMap<Producto, ProductoResponseDTO>();
             CreateMap<Cliente, ClienteResponseDTO>();
             CreateMap<Categoria, CategoriaResponseDTO>();
+            CreateMap<Factura, FacturaResponseDTO>();
+            CreateMap<DetalleFactura, DetalleFacturaResponseDTO>();
+               
 
         }
 

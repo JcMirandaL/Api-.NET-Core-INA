@@ -61,6 +61,10 @@ namespace InaApp.Entities
         //y que siempre va a tener un valor asignado, esto es importante para evitar errores de null reference exception en tiempo de ejecucion
         public Categoria Categoria { get; set; } = null!;
 
+        //relacion de 1 : N, 1 producto muchos detalles 
+        public ICollection<DetalleFactura> Detalles { get; set; } = new List<DetalleFactura>();
+
+
 
 
     }

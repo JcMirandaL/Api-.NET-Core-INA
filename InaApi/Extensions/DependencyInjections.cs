@@ -2,6 +2,7 @@
 using InaApp.Data;
 using InaApp.DTOs.CategoriaDTOs;
 using InaApp.DTOs.ClienteDTOs;
+using InaApp.DTOs.FacturaDTOs;
 using InaApp.DTOs.Producto;
 using InaApp.Repository;
 using InaApp.Services;
@@ -39,7 +40,8 @@ namespace InaApp.Api.Extensions
             //defino las inyeccion de dependencias
             services.AddScoped<IGenericService<ProductoResponseDTO, ProductoCreateDTO, ProductoUpdateDTO>, ProductoService>();
             services.AddScoped<IGenericService<ClienteResponseDTO, ClienteCreateDTO, ClienteUpdateDTO>, ClienteService>();
-            services.AddScoped<IGenericService<CategoriaResponseDTO, CategoriaCreateDTO, CategoriaUpdateDTO>, CategoriaSerrvice>();
+            services.AddScoped<IGenericService<CategoriaResponseDTO, CategoriaCreateDTO, CategoriaUpdateDTO>, CategoriaService>();
+            services.AddScoped<IGenericService<FacturaResponseDTO, FacturaCreateDTO, FacturaUpdateDTO>, FacturaService>();
 
 
 
@@ -49,6 +51,7 @@ namespace InaApp.Api.Extensions
             services.AddScoped<ProductoRepository>();
             services.AddScoped<ClienteRepository>();
             services.AddScoped<CategoriaRepository>();
+            services.AddScoped<FacturaRepository>();
 
 
             return services;

@@ -37,6 +37,9 @@ namespace InaApp.ProyectoInaApp.Mapping
             CreateMap<ClienteIndexViewModel, ClienteResponseDTO>();
             CreateMap<ClienteCreateViewModel, ClienteCreateDTO>();
             CreateMap<ClienteEditViewModel, ClienteUpdateDTO>();
+            //FACTURA
+            //CreateMap<FacturaIndexViewModel, FacturaResponseDTO>();
+            //CreateMap<FacturaCreateViewModel, FacturaCreateDTO>();
 
         }
 

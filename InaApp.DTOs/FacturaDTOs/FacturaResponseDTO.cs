@@ -1,0 +1,25 @@
+﻿using InaApp.DTOs.DetalleFacturaDTOs;
+
+
+namespace InaApp.DTOs.FacturaDTOs
+{
+    public class FacturaResponseDTO
+    {
+        public int Id { get; set; }
+        
+        public int ClienteId { get; set; }//FK
+
+        public string ClienteNombre { get; set; } = string.Empty;
+
+        public DateTime Fecha { get; set; } = DateTime.Now;
+
+        public decimal Subtotal { get; set; }
+
+        public int descuento { get; set; }
+
+        public decimal Total { get; set; }
+
+        //jalo los detalles en forma de lista x si hay mas de un producto
+        public List<DetalleFacturaResponseDTO> Detalles { get; set; } = new List<DetalleFacturaResponseDTO>();
+    }
+}

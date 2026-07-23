@@ -8,13 +8,13 @@ using InaApp.Entities;
 
 namespace InaApp.Services
 {
-    public class CategoriaSerrvice : IGenericService<CategoriaResponseDTO, CategoriaCreateDTO, CategoriaUpdateDTO>
+    public class CategoriaService : IGenericService<CategoriaResponseDTO, CategoriaCreateDTO, CategoriaUpdateDTO>
     {
         private readonly CategoriaRepository _categoriaRepository;
         //variable para inyectar mapper
         private readonly IMapper _mapper;
 
-        public CategoriaSerrvice(CategoriaRepository categoriaRepository, IMapper mapper)
+        public CategoriaService(CategoriaRepository categoriaRepository, IMapper mapper)
         {
             _categoriaRepository = categoriaRepository;
             _mapper = mapper;

@@ -226,7 +226,7 @@ namespace InaApp.Services
             producto.Estado = false;
 
             await _productoRepository.ActualizarAsync(producto);
-
+             
             return new Response<bool>
             {
                 Message = "Producto eliminado exitosamente.",

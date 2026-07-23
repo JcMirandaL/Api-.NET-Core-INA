@@ -144,14 +144,18 @@ namespace InaApp.Services
                 throw new NotFoundDbException($"El cliente con Id '{id}' no existe o esta inactivo en la base de datos.");
             }
 
+            clienteExistente.Estado = false;
+
+            await _clienteRepository.ActualizarAsync(clienteExistente);
+
             return new Response<bool>
             {
                 Message = "Cliente eliminado exitosamente.",
-                Data = await _clienteRepository.EliminarAsync(id),
+                Data = true,
                 Success = true
             };
         }
 
 
-    }
+    } 
 }

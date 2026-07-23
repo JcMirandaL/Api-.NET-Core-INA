@@ -59,5 +59,9 @@ namespace InaApp.Entities
         [Required(ErrorMessage = "Campo obligatorio.")]
         public string UsuarioCreacion { get; set; } = "admin";
 
+
+        //Relación 1 : N, un cliente tiene muchas facturas
+        public ICollection<Factura> Facturas { get; set; } = new List<Factura>();
+
     }
 }

@@ -30,8 +30,17 @@ namespace InaApp.Repository
                 .Include(x => x.Categoria)
                 .AsNoTracking()
                 .Where(x => x.Id == id && x.Estado == true)
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(); 
 
+        }
+
+        //metodo para guardar stock el de id no me sirve xq incluye categoria y ademas usa asNoTracking
+        public async Task<Producto?> ObtenerPorIdUpdateStockAsync(int id)
+        {
+   
+            return await _context.Productos
+                .Where(x => x.Id == id && x.Estado == true)
+                .SingleOrDefaultAsync();
         }
 
 

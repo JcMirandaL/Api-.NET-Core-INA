@@ -2,12 +2,6 @@
 using InaApp.Data;
 using InaApp.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.Repository
 {
@@ -26,7 +20,8 @@ namespace InaApp.Repository
         //crud
         public async Task<Cliente?> ObtenerPorIdAsync(int id)
         {
-            return await _context.Clientes.AsNoTracking()
+            return await _context.Clientes
+                .AsNoTracking()
                 .Where(x => x.Id == id && x.Estado == true)
                 .SingleOrDefaultAsync();
         }
@@ -57,20 +52,14 @@ namespace InaApp.Repository
         }
 
 
-        public async Task<bool> EliminarAsync(int id)
+        public Task<bool> EliminarAsync(int id)
         {
-            var cliente = await ObtenerPorIdAsync(id);
-
-            cliente.Estado = false;
-
-            _context.Clientes.Update(cliente);
-            await _context.SaveChangesAsync();
-            return true;
+           throw new NotImplementedException();
 
         }
 
 
-        public async Task<Cliente> ObtenerPorCedulaAsync(string cedula)
+        public async Task<Cliente?> ObtenerPorCedulaAsync(string cedula)
         {
             return await _context.Clientes.AsNoTracking()
                 .Where(x => x.Cedula == cedula && x.Estado == true)

@@ -22,5 +22,7 @@ namespace InaApp.DTOs.FacturaDTOs
 
         public decimal Total { get; set; }
 
+        public bool Estado { get; set; }
+
     }
 }

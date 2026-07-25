@@ -11,7 +11,7 @@ namespace InaApp.DTOs.FacturaDTOs
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "EL id del cliente debe ser un numero positivo")]
         public int ClienteId { get; set; }//FK
-
+         
         [Required]
         public DateTime Fecha { get; set; } = DateTime.Now;
 

@@ -1,9 +1,9 @@
-﻿@using InaApp.ProyectoInaApp.Models.Cliente
+﻿@using InaApp.ProyectoInaApp.Models.Factura
 
 
 
 <!--REUTILIZO EL VM de index q es solo para mostrar datos-->
-@model ClienteIndexViewModel
+@model FacturaIndexViewModel
 @{
     ViewData["Title"] = "Eliminar Cliente";
 }
@@ -11,28 +11,26 @@
 
 <div class="container mt-4">
 
-    <h2>Eliminar Cliente</h2>
+    <h2>Anular Factura</h2>
 
     <div class="alert alert-warning mt-3">
         <strong>Advertencia:</strong>
-        ¿Está seguro que desea eliminar el siguiente Cliente?
+        ¿Está seguro que desea anular la siguiente Factura?
     </div>
 
     <div class="card">
         <div class="card-header bg-danger text-white">
-            Confirmación de eliminación
+            Confirmación de anulación
         </div>
 
         <div class="card-body">
             <p><strong>Id:</strong> @Model.Id</p>
-            <p><strong>Cedula:</strong> @Model.Cedula</p>
-            <p><strong>Tipo Cedula:</strong> @Model.TipoCedula</p>
-            <p><strong>Nombre:</strong> @Model.Nombre</p>
-            <p><strong>Apellido 1:</strong> @Model.Apellido1</p>
-            <p><strong>Apellido 2:</strong> @Model.Apellido2</p>
-            <p><strong>Correo:</strong> @Model.Correo</p>
-            <p><strong>Telefono:</strong> @Model.Telefono</p>
-            <p><strong>Fecha de Nacimiento:</strong> @Model.FechaNacimiento</p>
+            <p><strong>ClienteNombre:</strong> @Model.ClienteNombre</p>
+            <p><strong>Fecha:</strong> @Model.Fecha</p>
+            <p><strong>Subtotal:</strong> @Model.Subtotal</p>
+            <p><strong>Descuento:</strong> @Model.descuento</p>
+            <p><strong>Total:</strong> @Model.Total</p>
+            <p><strong>Estado:</strong> @(Model.Estado ? "☑ Registrada" : "❌ Factura Anulada")</p>
         </div>
     </div>
 
@@ -41,7 +39,7 @@
         <input type="hidden" name="id" value="@Model.Id" />
 
         <button type="submit" class="btn btn-danger">
-            Sí, eliminar
+            Sí, Anular
         </button>
 
         <a asp-action="Index" class="btn btn-secondary">

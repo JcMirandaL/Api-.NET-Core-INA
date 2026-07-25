@@ -13,7 +13,8 @@
     <h2>Modificar Cliente</h2>
 
     <form asp-action="Edit" method="post">
-        <!--Esta linea es para mostrar errores generales cuando no pasa la valuiadcion de if(!response.Success) addModelError en el p[ost de edit -->
+
+        <!--Esta linea es para mostrar errores generales cuando no pasa la valuiadcion de if(!response.Success) addModelError en el p[ost de edit o en el cacth -->
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
         <!--campos oculto-->

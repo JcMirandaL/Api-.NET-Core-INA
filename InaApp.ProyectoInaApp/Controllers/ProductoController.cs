@@ -3,12 +3,9 @@ using InaApp.Common.Exceptions;
 using InaApp.Common.Interfaces;
 using InaApp.DTOs.CategoriaDTOs;
 using InaApp.DTOs.Producto;
-using InaApp.Entities;
 using InaApp.ProyectoInaApp.Models.Producto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Identity.Client;
-using System.Threading.Tasks;
 
 
 namespace InaApp.ProyectoInaApp.Controllers
@@ -21,11 +18,11 @@ namespace InaApp.ProyectoInaApp.Controllers
         private readonly IMapper _mapper;
 
         public ProductoController(
-            IGenericService<ProductoResponseDTO, 
-            ProductoCreateDTO, 
+            IGenericService<ProductoResponseDTO,
+            ProductoCreateDTO,
             ProductoUpdateDTO> productoService,
-            IGenericService<CategoriaResponseDTO, 
-            CategoriaCreateDTO, 
+            IGenericService<CategoriaResponseDTO,
+            CategoriaCreateDTO,
             CategoriaUpdateDTO> categoriaService,
             IMapper mapper)
         {
@@ -55,20 +52,14 @@ namespace InaApp.ProyectoInaApp.Controllers
             }
             catch (NotFoundDbException ex)
             {
-                //el ViewBag permiten pasar datos desde el controlador a la vista. Como por ejemplo,
-                //se puede utilizar ViewBag para pasar un mensaje de error a la vista en caso de que no se encuentren productos en la base de datos. Roles, userNmae, correo etc
-                //ViewData sirve para pasar datos desde el controlador a la vista, pero a diferencia de ViewBag, ViewData es un diccionario
-                //que permite almacenar y recuperar datos mediante claves.
-                //model: pasar datos, dtos, entities, viewModels, listados, etc. a la vista.
-                ViewBag.ErrorMessage = ex.Message;
-                return View();
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception)
             {
-                ViewBag.ErrorMessage = "Error interno del servidor. Contacte con el administrador.";
+                TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
                 // Manejar la excepción según sea necesario
-                return View();
-
+                return RedirectToAction(nameof(Index));
             }
 
         }
@@ -100,7 +91,7 @@ namespace InaApp.ProyectoInaApp.Controllers
             catch (Exception)
             {
                 TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -110,14 +101,9 @@ namespace InaApp.ProyectoInaApp.Controllers
         [HttpGet]//devuleve la vista para crear un producto
         public async Task<ActionResult> CreateAsync()
         {
-            //obtengo todas la categorias
-            var categorias = await _categoriaService.ObtenerTodosAsync();
-
-            //asigno las categorias a la propiedad del viewModel para que se puedan mostrar en la vista en el select
             var viewModel = new ProductoCreateViewModel
             {
-                //categorias propiedad del ProductoCrteateViewModel
-                Categorias = new SelectList(categorias.Data, "Id", "Nombre")
+                Categorias = await CargarSelectListAsync()
             };
 
             return View(viewModel);
@@ -127,7 +113,7 @@ namespace InaApp.ProyectoInaApp.Controllers
         [HttpPost]
         //este decorador es para vistas sirve para proteger la aplicación contra ataques de falsificación de solicitudes entre sitios (CSRF).
         //genera un tokken automatyico para evitar ataques
-        [ValidateAntiForgeryToken] 
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateAsync(ProductoCreateViewModel productoVM)
         {
             try
@@ -135,12 +121,7 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //para validar que los datos ingresados en el formulario cumplan con las reglas de validación definidas en el modelo de vista (ViewModel).DataAnotations
                 if (!ModelState.IsValid)
                 {
-                    //cargoi todas las categorias para que el select de la vista se pueda mostrar correctamente
-                    var categorias = await _categoriaService.ObtenerTodosAsync();
-                    //asigno las categopria al viewModel para que se pueda mostrar en la vista(select)
-                    productoVM.Categorias = new SelectList(categorias.Data, "Id", "Nombre");
-
-                    //si no es valido devuelva la vista con los datos ingresados para que el usuario pueda corregirlos
+                    productoVM.Categorias = await CargarSelectListAsync();
                     return View(productoVM);
                 }
 
@@ -154,11 +135,7 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //si el servicio devuelve un error, agrego un mensaje de error al ModelState y devuelvo la vista con los datos ingresados para que el usuario pueda corregirlos
                 if (!response.Success)
                 {
-                    //cargoi todas las categorias para que el select de la vista se pueda mostrar correctamente
-                    var categorias = await _categoriaService.ObtenerTodosAsync();
-                    //asigno las categopria al viewModel para que se pueda mostrar en la vista(select)
-                    productoVM.Categorias = new SelectList(categorias.Data, "Id", "Nombre");
-
+                    productoVM.Categorias = await CargarSelectListAsync();
                     ModelState.AddModelError(string.Empty, response.Message);
                     return View(productoVM);
                 }
@@ -170,14 +147,34 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //una vez guardado el producto, redirijo a la vista Index para que se muestre la lista de productos actualizada
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (NotNumberPositiveException ex)
             {
-                //si hay un error, devuelvo la vista para que el usuario pueda intentar crear el producto nuevamente
-                return View();
+                ModelState.AddModelError(string.Empty, ex.Message);
+                productoVM.Categorias = await CargarSelectListAsync();
+                return View(productoVM);
             }
+            catch (EntityExistDbException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                productoVM.Categorias = await CargarSelectListAsync();
+                return View(productoVM);
+            }
+            catch (NotFoundDbException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                productoVM.Categorias = await CargarSelectListAsync();
+                return View(productoVM);
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
+                productoVM.Categorias = await CargarSelectListAsync();
+                return View(productoVM);
+            }
+
         }
 
-        
+
 
         // GET: ProductoController/Edit/5
         public async Task<ActionResult> EditAsync(int id)
@@ -196,14 +193,20 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //.Data es xq los datos vienen encapsulados en un objeto de tipo ResponseDTO,
                 var productoEditVM = _mapper.Map<ProductoEditViewModel>(product.Data);
 
-                //obtengo todas la categorias
-                var categorias = await _categoriaService.ObtenerTodosAsync();
-
-                //asigno las categorias a la propiedad del viewModel para que se puedan mostrar en la vista en el select
-                productoEditVM.Categorias = new SelectList(categorias.Data, "Id", "Nombre");
+                productoEditVM.Categorias = await CargarSelectListAsync();
 
                 //pasamos el producto ya mapeada(model) a la vista para mostrar en la interfaz de usuario
                 return View(productoEditVM);
+            }
+            catch (NotNumberPositiveException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (NotFoundDbException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
             }
             catch
             {
@@ -226,13 +229,7 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //para validar que los datos ingresados en el formulario cumplan con las reglas de validación definidas en el modelo de vista (ViewModel).DataAnotations
                 if (!ModelState.IsValid)
                 {
-                    //obetngo las categorias
-                    var categorias = await _categoriaService.ObtenerTodosAsync();
-
-                    //asigno las categorias a la propiedad del viewModel para que se puedan mostrar en la vista en el select
-                    productoEditVM.Categorias = new SelectList(categorias.Data, "Id", "Nombre");
-
-                    //si no devuelva la vista con los datos ingresados para que el usuario pueda corregirlos
+                    productoEditVM.Categorias = await CargarSelectListAsync();
                     return View(productoEditVM);
                 }
 
@@ -246,12 +243,7 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //si el servicio devuelve un error, agrego un mensaje de error al ModelState y devuelvo la vista con los datos ingresados para que el usuario pueda corregirlos
                 if (!response.Success)
                 {
-                    //obetngo las categorias
-                    var categorias = await _categoriaService.ObtenerTodosAsync();
-
-                    //asigno las categorias a la propiedad del viewModel para que se puedan mostrar en la vista en el select
-                    productoEditVM.Categorias = new SelectList(categorias.Data, "Id", "Nombre");
-
+                    productoEditVM.Categorias = await CargarSelectListAsync();
                     ModelState.AddModelError(string.Empty, response.Message);
                     return View(productoEditVM);
                 }
@@ -264,9 +256,29 @@ namespace InaApp.ProyectoInaApp.Controllers
                 return RedirectToAction(nameof(Index));
 
             }
+            catch (NotNumberPositiveException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                productoEditVM.Categorias = await CargarSelectListAsync();
+                return View(productoEditVM);
+            }
+            catch (EntityExistDbException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                productoEditVM.Categorias = await CargarSelectListAsync();
+                return View(productoEditVM);
+            }
+            catch (NotFoundDbException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                productoEditVM.Categorias = await CargarSelectListAsync();
+                return View(productoEditVM);
+            }
             catch
             {
-                return View();
+                TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
+                productoEditVM.Categorias = await CargarSelectListAsync();
+                return View(productoEditVM);
             }
         }
 
@@ -318,14 +330,33 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //redirecciono a la vista Index para que se muestre la lista de productos actualizada
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (NotNumberPositiveException ex)
             {
-                return View();
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (NotFoundDbException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
+                return RedirectToAction(nameof(Index));
             }
                 
         }
 
-        
+
+
+        private async Task<SelectList> CargarSelectListAsync()
+        {
+            var categorias = await _categoriaService.ObtenerTodosAsync();
+            return new SelectList(categorias.Data, "Id", "Nombre");
+        }
+
+
 
     }
 }

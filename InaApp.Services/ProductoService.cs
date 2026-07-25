@@ -16,7 +16,7 @@ namespace InaApp.Services
         private readonly ProductoRepository _productoRepository;
         private readonly CategoriaRepository _categoriaRepository;
         //variable para inyectar mapper
-        private readonly IMapper _mapper;
+        private readonly IMapper _mapper; 
 
 
         //inyecto al repo en el constructor, el constructor es un metodo especial que se ejecuta cuando se crea una instancia de la clase,

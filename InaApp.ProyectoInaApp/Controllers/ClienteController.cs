@@ -45,8 +45,7 @@ namespace InaApp.ProyectoInaApp.Controllers
             catch (Exception)
             {
                 TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
-
-                return View(); 
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -74,8 +73,7 @@ namespace InaApp.ProyectoInaApp.Controllers
             catch (Exception)
             {
                 TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
-
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -161,7 +159,7 @@ namespace InaApp.ProyectoInaApp.Controllers
             catch (Exception)
             {
                 TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -197,19 +195,28 @@ namespace InaApp.ProyectoInaApp.Controllers
             }
             catch (NotNumberPositiveException ex)//exeption personalizada q se lanza desde el servicio si el id es negativo.
             {
-                TempData["ErrorMessage"] = ex.Message;
+                //Se usa ModelState en vez de TempData porque el error ocurre en un form POST.
+                //El usuario necesita ver el error EN el form para corregirlo y reintentar.
+                //TempData redirige y pierde los datos del form.
+                ModelState.AddModelError(string.Empty, ex.Message);
 
                 return View(clienteEditVM);
             }
             catch (NotFoundDbException ex)//exeption personalizada q se lanza desde el servicio
             {
-                TempData["ErrorMessage"] = ex.Message;
+                //Se usa ModelState en vez de TempData porque el error ocurre en un form POST.
+                //El usuario necesita ver el error EN el form para corregirlo y reintentar.
+                //TempData redirige y pierde los datos del form.
+                ModelState.AddModelError(string.Empty, ex.Message);
 
                 return View(clienteEditVM);
             }
             catch (EntityExistDbException ex)//exeption personalizada q se lanza desde el servicio si el cliente ya existe en la base de datos.
             {
-                TempData["ErrorMessage"] = ex.Message;
+                //Se usa ModelState en vez de TempData porque el error ocurre en un form POST.
+                //El usuario necesita ver el error EN el form para corregirlo y reintentar.
+                //TempData redirige y pierde los datos del form.
+                ModelState.AddModelError(string.Empty, ex.Message);
 
                 return View(clienteEditVM);
             }
@@ -217,7 +224,7 @@ namespace InaApp.ProyectoInaApp.Controllers
             {
                 TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
 
-                return View();
+                return View(clienteEditVM);
             }
         }
 
@@ -254,8 +261,7 @@ namespace InaApp.ProyectoInaApp.Controllers
             catch
             {
                 TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
-
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -293,8 +299,7 @@ namespace InaApp.ProyectoInaApp.Controllers
             catch
             {
                 TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
-
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
     }

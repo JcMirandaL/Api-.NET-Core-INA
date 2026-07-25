@@ -1,7 +1,126 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-    <h1>estoy en DETAILS Facturas</h1>
+﻿@using InaApp.ProyectoInaApp.Models.Factura
 
+@model FacturaDetailsViewModel
+
+@{
+    ViewData["Title"] = "Detalle de Factura";
 }
+
+<div class="container mt-4">
+
+    <h2>Detalle de Factura</h2>
+
+    <!-- ENCABEZADO -->
+    <div class="card mt-3">
+        <div class="card-header bg-primary text-white">
+            Información General
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-md-3">
+                    <strong>Factura:</strong><br />
+                    @Model.Id
+                </div>
+
+                <div class="col-md-4">
+                    <strong>Cliente:</strong><br />
+                    @Model.ClienteNombre
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Fecha:</strong><br />
+                    @Model.Fecha.ToString("dd/MM/yyyy")
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- DETALLE -->
+    <div class="card mt-4">
+        <div class="card-header bg-secondary text-white">
+            Productos Facturados
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+
+                    <tr>
+                        <th>Producto</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-end">Precio</th>
+                        <th class="text-end">Subtotal</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model.Detalles)
+                    {
+                        <tr>
+                            <td>@item.ProductoNombre</td>
+                            <td class="text-center">
+                                @item.Cantidad
+                            </td>
+                            <td class="text-end">
+                                ₡@item.Precio.ToString("N2")
+                            </td>
+                            <td class="text-end">
+                                ₡@item.Subtotal.ToString("N2")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TOTALES -->
+    <div class="card mt-4">
+
+        <div class="card-header bg-success text-white">
+            Resumen
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-4 offset-md-8">
+
+                    <table class="table table-borderless">
+                        
+                        <tr>
+                            <th>Subtotal:</th>
+                            <td class="text-end">
+                                ₡@Model.Subtotal.ToString("N2")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Descuento:</th>
+                            <td class="text-end">
+                                @Model.Descuento%
+                            </td>
+                        </tr>
+
+                        <tr class="table-success">
+                            <th>Total:</th>
+                            <th class="text-end">
+                                ₡@Model.Total.ToString("N2")
+                            </th>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary mt-4">
+        Volver al listado
+    </a>
+
+</div>

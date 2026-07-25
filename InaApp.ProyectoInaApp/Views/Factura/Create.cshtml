@@ -1,7 +1,185 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-    <h1>estoy en cREATE Facturas</h1>
+﻿@using InaApp.ProyectoInaApp.Models.Factura
 
+@model FacturaCreateViewModel
+
+@{
+    ViewData["Title"] = "Crear Factura";
+}
+
+<h2>Crear Factura</h2>
+
+<form asp-action="Create" method="post">
+
+    <!-- Muestra errores de ModelState (ej: stock insuficiente, descuento inválido) -->
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            Datos de la Factura
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <label asp-for="ClienteId" class="form-label"></label>
+                <select asp-for="ClienteId"
+                        asp-items="Model.Clientes"
+                        class="form-select">
+                    <option value="">Seleccione un cliente</option>
+                </select>
+                <span asp-validation-for="ClienteId"
+                      class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <!----------------AGREGAR PRODUCTO--------------->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            Agregar Producto
+        </div>
+
+        <div class="card-body">
+
+            <div class="col-md-6">
+                <label asp-for="Descuento"
+                       class="form-label"></label>
+                <input asp-for="Descuento"
+                       class="form-control" />
+                <span asp-validation-for="Descuento" class="text-danger"></span>
+
+            </div>
+
+            <br />
+            <hr />
+            <br />
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <label asp-for="ProductoId" class="form-label"></label>
+                    <select asp-for="ProductoId"
+                            asp-items="Model.Productos"
+                            class="form-select">
+                        <option value="">
+                            Seleccione un producto
+                        </option>
+                    </select>
+                    <span asp-validation-for="ProductoId"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Cantidad"
+                           class="form-label"></label>
+                    <input asp-for="Cantidad"
+                           class="form-control" />
+                    <span asp-validation-for="Cantidad" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit"
+                            asp-action="AddProduct"
+                            class="btn btn-success w-100">
+                        Agregar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!--------------- DETALLE -------------->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            Detalle de la Factura
+        </div>
+
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <!--uso for en cez de  foreach xq la lista debe enviarse nuevamente al controlador mediante inputs hidden.
+                    con el índice [i] permite reconstruir la lista ViewModel al hacer POST.(ya los tiene mapeados)-->
+                    @for (int i = 0; i < Model.Detalles.Count; i++)
+                    {
+                        var item = Model.Detalles[i];
+
+                        <!-- Hidden fields para que los detalles viajen en el form -->
+                        <input type="hidden" name="Detalles[@i].ProductoId" value="@item.ProductoId" />
+                        <input type="hidden" name="Detalles[@i].ProductoNombre" value="@item.ProductoNombre" />
+                        <input type="hidden" name="Detalles[@i].Precio" value="@item.Precio" />
+                        <input type="hidden" name="Detalles[@i].Cantidad" value="@item.Cantidad" />
+                        <input type="hidden" name="Detalles[@i].Subtotal" value="@item.Subtotal" />
+
+                        <tr>
+                            <td>@item.ProductoNombre</td>
+                            <td>₡@item.Precio.ToString("N2")</td>
+                            <td>@item.Cantidad</td>
+                            <td>₡@item.Subtotal.ToString("N2")</td>
+                            <td>
+                                <button type="submit"
+                                        asp-action="RemoveProduct"
+                                        asp-route-productoId="@item.ProductoId"
+                                        formnovalidate
+                                        class="btn btn-danger btn-sm">
+                                    Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!----------- TOTALES----------->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            Resumen
+        </div>
+        <div class="card-body">
+
+            <div class="text-end">
+                <h4>
+                    Subtotal:
+                    ₡@Model.Subtotal.ToString("N2")
+                </h4>
+
+                <h4>
+                    Descuento:
+                    @Model.Descuento%
+                </h4>
+
+                <h4>
+                    Total:
+                    ₡@Model.Total.ToString("N2")
+                </h4>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit"
+            class="btn btn-primary">
+        Guardar Factura
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

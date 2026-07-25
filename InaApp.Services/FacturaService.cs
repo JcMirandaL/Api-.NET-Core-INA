@@ -6,6 +6,7 @@ using InaApp.Data;
 using InaApp.DTOs.FacturaDTOs;
 using InaApp.Entities;
 using InaApp.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace InaApp.Services
 {
@@ -49,13 +50,25 @@ namespace InaApp.Services
                 throw new NotFoundDbException($"El Id {id} de la factura no existe o esta inactivo");
             }
 
-            //retorno un Response con el DTO mapeado, un mensaje y el success en true, el mapeo se encarga de asignar los valores a las propiedades del DTO
-            //Esta estructura Response Esta definida en la carpeta Response de la capa DTOs
+            //paso de entity a DTO mapoeado a la lista
+            var facturaDTO = _mapper.Map<FacturaResponseDTO>(factura);
+
+            // Calcular el subtotal de cada linea de detalle
+            foreach (var f in facturaDTO.Detalles)
+            {
+                f.Subtotal = f.Cantidad * f.Precio;
+            }
+
+            // Calcular subtotal general de la factura sumando los subtotales de cada detalle
+            facturaDTO.Subtotal = facturaDTO.Detalles.Sum(x => x.Subtotal);
+
+            // Calcular total
+            facturaDTO.Total = facturaDTO.Subtotal - (facturaDTO.Subtotal * facturaDTO.descuento / 100);
+
             return new Response<FacturaResponseDTO>
             {
                 Message = "Factura encontrada exitosamente: ",
-                //paso de DTO a entity
-                Data = _mapper.Map<FacturaResponseDTO>(factura),
+                Data = facturaDTO,
                 Success = true
             };
         }
@@ -69,11 +82,19 @@ namespace InaApp.Services
                 throw new NotFoundDbException("No se encontraron facturas activas en la base de datos.");
             }
 
+            //paso de entity a DTO mapoeado a la lista
+            var listaFacturasDTO = _mapper.Map<List<FacturaResponseDTO>>(listaFacturas);
+
+            foreach (var factura in listaFacturasDTO)
+            {
+                factura.Subtotal = factura.Detalles.Sum(d => d.Cantidad * d.Precio);
+                factura.Total = factura.Subtotal - (factura.Subtotal * factura.descuento / 100);
+            }
+
             return new Response<List<FacturaResponseDTO>>
             {
                 Message = "Clientes obtenidos exitosamente.",
-                //paso de entity a DTO mapoeado a la lista
-                Data = _mapper.Map<List<FacturaResponseDTO>>(listaFacturas),
+                Data = listaFacturasDTO,
                 Success = true
             };
         }
@@ -171,13 +192,41 @@ namespace InaApp.Services
         }
 
 
+        public async Task<Response<bool>> EliminarAsync(int id)
+        {
+            if (id <= 0)
+            {
+                throw new NotNumberPositiveException($"El Id '{id}' de la factura debe ser un número positivo.");
+            }
+
+            var facturaExistente = await _facturaRepository.ObtenerPorIdAsync(id);
+            if (facturaExistente == null)
+            {
+                throw new NotFoundDbException($"El cliente con Id '{id}' no existe o esta inactivo en la base de datos.");
+            }
+
+            foreach (var detalle in facturaExistente.Detalles)
+            {
+               
+                detalle.Producto.Stock += detalle.Cantidad; // Devolver el stock del producto
+            }
+
+            facturaExistente.Estado = false;
+
+            await _facturaRepository.ActualizarAsync(facturaExistente);
+
+            return new Response<bool>
+            {
+                Message = "Factura anulada exitosamente.",
+                Data = true,
+                Success = true
+            };
+        }
+
+
         
         //se implementa para cumplir con interfaz pero no se usa
         public Task<Response<FacturaResponseDTO>> ActualizarAsync(FacturaUpdateDTO entity)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<Response<bool>> EliminarAsync(int id)
         {
             throw new NotImplementedException();
         }

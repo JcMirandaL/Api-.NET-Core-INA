@@ -2,12 +2,8 @@
 using InaApp.Common.Exceptions;
 using InaApp.Common.Interfaces;
 using InaApp.DTOs.CategoriaDTOs;
-using InaApp.Entities;
 using InaApp.ProyectoInaApp.Models.Categoria;
-using InaApp.ProyectoInaApp.Models.Producto;
-using InaApp.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace InaApp.ProyectoInaApp.Controllers
 {
@@ -44,14 +40,14 @@ namespace InaApp.ProyectoInaApp.Controllers
             catch (NotFoundDbException ex)
             {
                 //temData para almacenart el msj temporalmente y mostrarlo en la vista, luego se borra cuando hay una nueva solicitud
-                TempData["SuccessMessage"] = ex.Message;
-                return View();
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
 
             }
             catch (Exception)
             {
                 TempData["ErrorMessage"] = "Error en el servidor. Contacte con el administrador.";
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -82,7 +78,7 @@ namespace InaApp.ProyectoInaApp.Controllers
             catch (Exception)
             {
                 TempData["ErrorMessage"] = "Error en el servidor. Contacte con el administrador.";
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -129,8 +125,10 @@ namespace InaApp.ProyectoInaApp.Controllers
             }
             catch (EntityExistDbException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
-                //devuelvo la vista con los datos ingresados para que el usuario pueda corregirlos
+                //Se usa ModelState en vez de TempData porque el error ocurre en un form POST.
+                //El usuario necesita ver el error EN el form para corregirlo y reintentar.
+                //TempData redirige y pierde los datos del form.
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return View(categoriaCreateVM);
             }
             catch
@@ -143,6 +141,7 @@ namespace InaApp.ProyectoInaApp.Controllers
 
 
         // GET: CategoriaController/Edit/5
+        [HttpGet]
         public async Task<ActionResult> EditAsync(int id)
         {
             try
@@ -162,10 +161,26 @@ namespace InaApp.ProyectoInaApp.Controllers
                 //pasamos el producto ya mapeada(model) a la vista para mostrar en la interfaz de usuario
                 return View(categoryEditVM);
             }
-            catch 
+            catch (NotNumberPositiveException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+
+            }
+            catch (NotFoundDbException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (EntityExistDbException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
             { 
                 TempData["ErrorMessage"] = "Error en el servidor. Contacte con el administrador.";
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -205,20 +220,26 @@ namespace InaApp.ProyectoInaApp.Controllers
             }
             catch (NotNumberPositiveException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
-                //devuelvo la vista con los datos ingresados para que el usuario pueda corregirlos
+                //Se usa ModelState en vez de TempData porque el error ocurre en un form POST.
+                //El usuario necesita ver el error EN el form para corregirlo y reintentar.
+                //TempData redirige y pierde los datos del form.
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return View(categoriaEditVM);
             }
             catch (NotFoundDbException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
-                //devuelvo la vista con los datos ingresados para que el usuario pueda corregirlos
+                //Se usa ModelState en vez de TempData porque el error ocurre en un form POST.
+                //El usuario necesita ver el error EN el form para corregirlo y reintentar.
+                //TempData redirige y pierde los datos del form.
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return View(categoriaEditVM);
             }
             catch (EntityExistDbException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
-                //devuelvo la vista con los datos ingresados para que el usuario pueda corregirlos
+                //Se usa ModelState en vez de TempData porque el error ocurre en un form POST.
+                //El usuario necesita ver el error EN el form para corregirlo y reintentar.
+                //TempData redirige y pierde los datos del form.
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return View(categoriaEditVM);
             }
             catch
@@ -251,10 +272,20 @@ namespace InaApp.ProyectoInaApp.Controllers
 
                 return View(categoryDeleteVM);
             }
+            catch (NotNumberPositiveException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (NotFoundDbException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
             catch
             {
                 TempData["ErrorMessage"] = "Error en el servidor. Contacte con el administrador.";
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -283,17 +314,17 @@ namespace InaApp.ProyectoInaApp.Controllers
             catch (NotNumberPositiveException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                return View();
+                return RedirectToAction(nameof(Index));
             }
             catch (NotFoundDbException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                return View();
+                return RedirectToAction(nameof(Index));
             }
             catch
             {
                 TempData["ErrorMessage"] = "Error en el servidor. Contacte con el administrador.";
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
 

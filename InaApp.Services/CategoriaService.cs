@@ -19,7 +19,7 @@ namespace InaApp.Services
             _categoriaRepository = categoriaRepository;
             _mapper = mapper;
         }
-
+         
 
 
 

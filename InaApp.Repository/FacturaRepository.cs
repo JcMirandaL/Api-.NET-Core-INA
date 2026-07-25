@@ -28,7 +28,7 @@ namespace InaApp.Repository
                 .Include(x => x.Detalles)
                 .ThenInclude(x => x.Producto)//el then include es para traer lkos datos de producto desde detalles
                 .AsNoTracking()
-                .Where(x => x.Id == id && x.Estado == true)
+                .Where(x => x.Id == id)
                 .SingleOrDefaultAsync();
         }
 
@@ -40,7 +40,6 @@ namespace InaApp.Repository
                 .Include(x => x.Detalles)
                 .ThenInclude(x => x.Producto)//el then include es para traer lkos datos de producto desde detalles
                 .AsNoTracking()
-                .Where(x => x.Estado == true)
                 .ToListAsync();
         }
 
@@ -53,11 +52,15 @@ namespace InaApp.Repository
         }
 
 
-        //metodos no utilizados pero para cumplir con interfaz
-        public Task<Factura> ActualizarAsync(Factura entity)
+        public async Task<Factura> ActualizarAsync(Factura entity)
         {
-            throw new NotImplementedException();
+            _context.Factura.Update(entity);
+            await _context.SaveChangesAsync();
+            return entity;
         }
+
+
+        //metodos no utilizados pero para cumplir con interfaz
         public Task<bool> EliminarAsync(int id)
         {
             throw new NotImplementedException();

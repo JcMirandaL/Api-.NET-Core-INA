@@ -14,6 +14,8 @@
 
         public decimal Total { get; set; }
 
+        public bool Estado { get; set; }
+
         public List<DetalleFacturaViewModel> Detalles { get; set; } = new List<DetalleFacturaViewModel>();
 
     }

@@ -33,6 +33,10 @@
                     <strong>Fecha:</strong><br />
                     @Model.Fecha.ToString("dd/MM/yyyy")
                 </div>
+                <div class="col-md-2">
+                    <strong>Estado:</strong><br />
+                    @(Model.Estado ? "☑ Registrada" : "❌ Factura Anulada")
+                </div>
 
             </div>
         </div>

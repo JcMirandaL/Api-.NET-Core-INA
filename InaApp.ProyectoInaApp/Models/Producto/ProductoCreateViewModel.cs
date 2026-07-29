@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.ProyectoInaApp.Models.Producto
 {
@@ -15,7 +16,7 @@ namespace InaApp.ProyectoInaApp.Models.Producto
         [Display(Name = "Nombre del producto")]
         [Required(ErrorMessage = "El nombre es un campo obligatorio.")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 100 caracteres.")]
-        public string Nombre { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty; 
 
         [Display(Name = "Precio del producto")]
         [Required(ErrorMessage = "El precio es un campo obligatorio.")]
@@ -31,6 +32,15 @@ namespace InaApp.ProyectoInaApp.Models.Producto
         [Display(Name = "Descripcion del producto")]
         [StringLength(500, ErrorMessage = "La descripcion NO debe superar un maximo de 500 caracterres.")]
         public string? Descripcion { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Campo obligatorio.")]
+        [EnumDataType(typeof(TipoImpuestoAplicable), ErrorMessage = "Escoja una opcion valida")]
+        [Display(Name = "Impuesto Aplicable")]
+        public TipoImpuestoAplicable ImpuestoAplicable { get; set; }
+
+        [Display(Name = "Descuento Maximo")]
+        [Range(0, 100, ErrorMessage = "El descuento maximo debe ser un numero entre 0 y 100.")]
+        public int DescuentoMaximo { get; set; } = 0;
 
     }
 }

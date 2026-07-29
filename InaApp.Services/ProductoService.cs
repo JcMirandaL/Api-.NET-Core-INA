@@ -1,11 +1,12 @@
 ﻿//los using son para importar las clases de otros proyectos o librerias
-using InaApp.Common.Interfaces;
+using AutoMapper;
 using InaApp.Common.Exceptions;
+using InaApp.Common.Interfaces;
 using InaApp.Common.Response;
+using InaApp.DTOs.Producto;
 using InaApp.Entities;
 using InaApp.Repository;
-using InaApp.DTOs.Producto;
-using AutoMapper;
+using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.Services
 {
@@ -105,6 +106,8 @@ namespace InaApp.Services
                 throw new NotNumberPositiveException($"El precio debe ser mayor a 0. Precio Ingresado: {entity.Precio}.");
             }
 
+
+            
             //creo una nueva instancia de producto y le asigno los valores que llegan por el parametro, para luego pasarla al repo y guardarla en la base de datos
             //MANERA VIEJA DE MAPEAR, CREANDO UNA NUEVA INSTANCIA DE LA ENTIDAD Y ASIGNANDO LOS VALORES MANUALMENTE
             //Producto nuevoProducto = new Producto
@@ -131,6 +134,50 @@ namespace InaApp.Services
             //pasa de createDTO a entity, mapea las propiedades con el mismo nombre y tipo de dato, si no son iguales hay que configurar el mapeo en el profile de automapper
             //LO QUE ESTA ENTRE <> ES EL TIPO DESTINO
             Producto nuevoProducto = _mapper.Map<Producto>(entity);
+
+            //asigno el porcentaje segun el tipoImpuesto escojido por el usuario
+            switch (nuevoProducto.ImpuestoAplicable)
+            {
+                case TipoImpuestoAplicable.IVA:
+                    nuevoProducto.PorcentajeImpuesto = 13;
+                    break;
+
+                case TipoImpuestoAplicable.ISC:
+                    nuevoProducto.PorcentajeImpuesto = 1;
+                    break;
+
+                case TipoImpuestoAplicable.IUC:
+                    nuevoProducto.PorcentajeImpuesto = 2;
+                    break;
+
+                case TipoImpuestoAplicable.IEBA:
+                    nuevoProducto.PorcentajeImpuesto = 4;
+                    break;
+
+                case TipoImpuestoAplicable.IESBECAJT:
+                    nuevoProducto.PorcentajeImpuesto = 0;
+                    break;
+
+                case TipoImpuestoAplicable.IPT:
+                    nuevoProducto.PorcentajeImpuesto = 4;
+                    break;
+
+                case TipoImpuestoAplicable.IVACE:
+                    nuevoProducto.PorcentajeImpuesto = 8;
+                    break;
+
+                case TipoImpuestoAplicable.IVARBUF:
+                    nuevoProducto.PorcentajeImpuesto = 0.5m;//m para decirle que es decimal y no double, sino da error de conversion
+                    break;
+
+                case TipoImpuestoAplicable.IEC:
+                    nuevoProducto.PorcentajeImpuesto = 3;
+                    break;
+
+                default:
+                    nuevoProducto.PorcentajeImpuesto = 2;
+                    break;
+            }
 
             nuevoProducto = await _productoRepository.CrearAsync(nuevoProducto);
 
@@ -190,6 +237,50 @@ namespace InaApp.Services
             //passo de DTO a Entity
             //LO QUE ESTA ENTRE <> ES EL TIPO DESTINO
             Producto productoActualizar = _mapper.Map<Producto>(entity);
+
+            //asigno el porcentaje segun el tipoImpuesto escojido por el usuario
+            switch (productoActualizar.ImpuestoAplicable)
+            {
+                case TipoImpuestoAplicable.IVA:
+                    productoActualizar.PorcentajeImpuesto = 13;
+                    break;
+
+                case TipoImpuestoAplicable.ISC:
+                    productoActualizar.PorcentajeImpuesto = 1;
+                    break;
+
+                case TipoImpuestoAplicable.IUC:
+                    productoActualizar.PorcentajeImpuesto = 2;
+                    break;
+
+                case TipoImpuestoAplicable.IEBA:
+                    productoActualizar.PorcentajeImpuesto = 4;
+                    break;
+
+                case TipoImpuestoAplicable.IESBECAJT:
+                    productoActualizar.PorcentajeImpuesto = 0;
+                    break;
+
+                case TipoImpuestoAplicable.IPT:
+                    productoActualizar.PorcentajeImpuesto = 4;
+                    break;
+
+                case TipoImpuestoAplicable.IVACE:
+                    productoActualizar.PorcentajeImpuesto = 8;
+                    break;
+
+                case TipoImpuestoAplicable.IVARBUF:
+                    productoActualizar.PorcentajeImpuesto = 0.5m;//m para decirle que es decimal y no double, sino da error de conversion
+                    break;
+
+                case TipoImpuestoAplicable.IEC:
+                    productoActualizar.PorcentajeImpuesto = 3;
+                    break;
+
+                default:
+                    productoActualizar.PorcentajeImpuesto = 2;
+                    break;
+            }
 
             //actualice con la entidad mapeada
             productoActualizar = await _productoRepository.ActualizarAsync(productoActualizar);

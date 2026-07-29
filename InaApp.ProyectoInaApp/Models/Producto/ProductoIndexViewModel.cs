@@ -1,4 +1,6 @@
-﻿namespace InaApp.ProyectoInaApp.Models.Producto
+﻿using static InaApp.Common.Enums.Enumeradores;
+
+namespace InaApp.ProyectoInaApp.Models.Producto
 {
     public class ProductoIndexViewModel
     {
@@ -12,6 +14,12 @@
 
         public int Stock { get; set; }
 
-        public string? Descripcion { get; set; } = string.Empty;
+        //public string? Descripcion { get; set; } = string.Empty;
+
+        public TipoImpuestoAplicable ImpuestoAplicable { get; set; }
+
+        public decimal PorcentajeImpuesto { get; set; }
+
+        public int DescuentoMaximo { get; set; }
     }
 }

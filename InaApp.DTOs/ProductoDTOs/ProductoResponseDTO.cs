@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.DTOs.Producto
 {
@@ -23,6 +18,12 @@ namespace InaApp.DTOs.Producto
         public int Stock { get; set; }
        
         public string? Descripcion { get; set; } = string.Empty;
-       
+
+        public TipoImpuestoAplicable ImpuestoAplicable { get; set; }
+
+        public decimal PorcentajeImpuesto { get; set; } = 0;
+
+        public int DescuentoMaximo { get; set; } = 0;
+
     }
 }

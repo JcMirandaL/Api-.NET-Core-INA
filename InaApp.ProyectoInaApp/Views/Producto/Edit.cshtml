@@ -1,4 +1,5 @@
 ﻿@using InaApp.ProyectoInaApp.Models.Producto
+@using static InaApp.Common.Enums.Enumeradores
 
 
 @model ProductoEditViewModel
@@ -46,6 +47,23 @@
             <label asp-for="Stock" class="form-label"></label>
             <input asp-for="Stock" class="form-control" />
             <span asp-validation-for="Stock" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ImpuestoAplicable" class="form-label"></label>
+            <!--El html.getEnum es para jalar el enum y se muestre en el select-->
+            <select asp-for="ImpuestoAplicable"
+                    asp-items="Html.GetEnumSelectList<TipoImpuestoAplicable>()"
+                    class="form-select">
+                <option value="">Seleccione un tipo</option>
+            </select>
+            <span asp-validation-for="ImpuestoAplicable" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="DescuentoMaximo" class="form-label"></label>
+            <input asp-for="DescuentoMaximo" class="form-control" />
+            <span asp-validation-for="DescuentoMaximo" class="text-danger"></span>
         </div>
 
         <button type="submit" class="btn btn-success mt-3">

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.Entities
 {
@@ -42,6 +38,17 @@ namespace InaApp.Entities
         //string empy lo inicia en cero y evita el warning de propiedad null
         [StringLength(500, ErrorMessage = "La descripcion NO debe superar un maximo de 500 caracterres.")]
         public string? Descripcion { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El impuesto aplicable es un campo obligatorio.")]
+        [EnumDataType(typeof(TipoImpuestoAplicable), ErrorMessage = "Escoja una opcion valida")]
+        public TipoImpuestoAplicable ImpuestoAplicable { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        [Range(0, 100, ErrorMessage = "El porcentaje de impuesto debe ser un numero entre 0 y 100.")]
+        public decimal PorcentajeImpuesto { get; set; } = 0;
+
+        [Range(0, 100, ErrorMessage = "El descuento maximo debe ser un numero entre 0 y 100.")]
+        public int DescuentoMaximo { get; set; } = 0;
 
         [Required(ErrorMessage = "El estado es un campo obligatorio.")]
         public bool Estado { get; set; } = true;

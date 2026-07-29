@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.DTOs.Producto
 {
@@ -31,6 +26,13 @@ namespace InaApp.DTOs.Producto
         [StringLength(500, ErrorMessage = "La descripcion NO debe superar un maximo de 500 caracterres.")]
         public string? Descripcion { get; set; } = string.Empty;
 
-       
+        [Required(ErrorMessage = "Campo obligatorio.")]
+        [EnumDataType(typeof(TipoImpuestoAplicable), ErrorMessage = "Escoja una opcion valida")]
+        public TipoImpuestoAplicable ImpuestoAplicable { get; set; }
+
+        [Range(0, 100, ErrorMessage = "El descuento maximo debe ser un numero entre 0 y 100.")]
+        public int DescuentoMaximo { get; set; } = 0;
+
     }
 }
+ 

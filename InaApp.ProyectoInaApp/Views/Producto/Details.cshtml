@@ -21,7 +21,9 @@
             <p><strong>Categoria:</strong> @Model.CategoriaNombre</p>
             <p><strong>Precio:</strong> ₡@Model.Precio.ToString("N2")</p>
             <p><strong>Stock:</strong> @Model.Stock</p>
-            <p><strong>Descripción:</strong> @Model.Descripcion</p>
+            <p><strong>Impuesto Aplicable:</strong> @Html.DisplayFor(m => Model.ImpuestoAplicable)</p>
+            <p><strong>Porcentaje Impuesto:</strong> @Model.PorcentajeImpuesto.ToString("N1")%</p>
+            <p><strong>Descuento Máximo:</strong> @Model.DescuentoMaximo%</p>
         </div>
 
     </div>

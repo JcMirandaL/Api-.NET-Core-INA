@@ -24,6 +24,43 @@ namespace InaApp.Common.Enums
             Pasaporte = 5
         }
 
+        public enum TipoImpuestoAplicable
+        {
+            [Display(Name = " Impuesto al Valor Agregado")]
+            IVA = 1,
+
+            [Display(Name = "Impuesto Selectivo de Consumo")]
+            ISC = 2,
+
+            [Display(Name = "Impuesto Unico a los Combustivos")]
+            IUC = 3,
+
+            [Display(Name = "Impuesto Especifico de Bebidas Alcohólicas")]
+            IEBA = 4,
+
+            [Display(Name = "Impuesto Especifico Sobre las Bebidas Envasadas Sin Contenido Alcoholico y Jabones de Tocador")]
+            IESBECAJT = 5,
+
+
+            [Display(Name = "Impuesto a los Productos de Tabaco")]
+            IPT = 6,
+
+            [Display(Name = "IVA(cálculo especial)")]
+            IVACE = 7,
+
+
+            [Display(Name = "IVA Régimen de Bienes Usados (Factor)")]
+            IVARBUF = 8,
+
+            [Display(Name = "Impuesto Especifico al Cemento")]
+            IEC = 12,
+
+            [Display(Name = "Otros")]
+            Otros = 99
+
+        }
+
+
 
         public enum TipoVentaEnum
         {

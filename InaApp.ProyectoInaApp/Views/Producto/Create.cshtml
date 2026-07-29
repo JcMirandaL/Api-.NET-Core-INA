@@ -1,4 +1,5 @@
 ﻿@using InaApp.ProyectoInaApp.Models.Producto
+@using static InaApp.Common.Enums.Enumeradores
 
 
 @model ProductoCreateViewModel
@@ -45,6 +46,23 @@
         <textarea asp-for="Descripcion" class="form-control"></textarea>
         <!--Este span unicamente pinta el msj de error, pero sin el section Scripts de abajo no funciona-->
         <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ImpuestoAplicable" class="form-label"></label>
+        <!--El html.getEnum es para jalar el enum y se muestre en el select-->
+        <select asp-for="ImpuestoAplicable"
+                asp-items="Html.GetEnumSelectList<TipoImpuestoAplicable>()"
+                class="form-select">
+            <option value="">Seleccione un tipo</option>
+        </select>
+        <span asp-validation-for="ImpuestoAplicable" class="text-danger"></span>
+    </div>
+        
+    <div class="mb-3">
+        <label asp-for="DescuentoMaximo" class="form-label"></label>
+        <input asp-for="DescuentoMaximo" class="form-control" />
+        <span asp-validation-for="DescuentoMaximo" class="text-danger"></span>
     </div>
 
 

@@ -47,7 +47,7 @@ namespace InaApp.ProyectoInaApp.Controllers
             }
             catch (NotFoundDbException ex)
             {
-                //Se usa TempData porque es un GET redirige a Index. ModelState se pierde en redirect.
+                //Se usa TempData porque es un GET redirige a Index. ModelState se pierde en redirect xq solo vive en la peticion actual.
                 TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction(nameof(Index));
             }

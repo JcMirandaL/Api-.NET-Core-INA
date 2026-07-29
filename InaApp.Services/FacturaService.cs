@@ -6,7 +6,6 @@ using InaApp.Data;
 using InaApp.DTOs.FacturaDTOs;
 using InaApp.Entities;
 using InaApp.Repository;
-using Microsoft.EntityFrameworkCore;
 
 namespace InaApp.Services
 {
@@ -23,7 +22,6 @@ namespace InaApp.Services
             FacturaRepository facturaRepository, 
             ClienteRepository clienteRepository,
             ProductoRepository productoRepository,
-            ApplicationDbContex context,
             IMapper mapper)
         {
             _facturaRepository = facturaRepository;
@@ -172,6 +170,7 @@ namespace InaApp.Services
             //actualizo cliente de la factura con el cliente existente
             //esto para que cargue el nombrte del cliente en el DTO de respuesta y no usar include en el repo(create-actualizar)
             nuevaFactura.Cliente = clienteExist;
+            //Paso de entity a DTO para la respuesta
             var responseDTO = _mapper.Map<FacturaResponseDTO>(nuevaFactura);
             responseDTO.Subtotal = subtotal;
             responseDTO.Total = total;

@@ -27,9 +27,11 @@
                 <th>Id</th>
                 <th>Nombre</th>
                 <th>Categoria</th>
-                <th>Descripción</th>
                 <th>Precio</th>
                 <th>Stock</th>
+                <th>Impuesto Aplicable</th>
+                <th>Porcentaje Impuesto</th>
+                <th>Descuento Maximo</th>
                 <th class="text-center">Acciones</th>
             </tr>
         </thead>
@@ -43,9 +45,11 @@
                         <td>@producto.Id</td>
                         <td>@producto.Nombre</td>
                         <td>@producto.CategoriaNombre</td>
-                        <td>@producto.Descripcion</td>
                         <td>₡@producto.Precio.ToString("N2")</td>
                         <td>@producto.Stock</td>
+                        <td>@Html.DisplayFor(m => producto.ImpuestoAplicable)</td>
+                        <td>@producto.PorcentajeImpuesto.ToString("N1")%</td>
+                        <td>@producto.DescuentoMaximo%</td>
                         <td class="text-center">
                             <a asp-action="Details"
                                asp-route-id="@producto.Id"
@@ -72,7 +76,7 @@
             else
             {
                 <tr>
-                    <td colspan="6" class="text-center">
+                    <td colspan="9" class="text-center">
                         No existen productos registrados.
                     </td>
                 </tr>

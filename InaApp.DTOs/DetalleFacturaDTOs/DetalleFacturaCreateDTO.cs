@@ -14,5 +14,9 @@ namespace InaApp.DTOs.DetalleFacturaDTOs
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "La cantidad debe ser un numero positivo.")]
         public int Cantidad { get; set; }
+
+        //porcentaje de descuento que el usuario quiere aplicar a esta línea
+        [Range(0, 100, ErrorMessage = "El descuento debe estar entre 0 y 100.")]
+        public int DescuentoAplicado { get; set; }
     }
 }

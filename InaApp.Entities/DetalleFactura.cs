@@ -24,6 +24,10 @@ namespace InaApp.Entities
         [Range(0.01, double.MaxValue, ErrorMessage = "El precio debe ser mayor que cero.")]
         public decimal Precio { get; set; }
 
+        //porcentaje de descuento aplicado a esta línea (se valida contra DescuentoMaximo del producto)
+        [Range(0, 100, ErrorMessage = "El descuento debe estar entre 0 y 100.")]
+        public int DescuentoAplicado { get; set; }
+
 
         //el ! en el null es para indicar que esta propiedad no puede ser null, es decir, que siempre debe tener un valor asignado
         //esto es necesario porque la propiedad Categoria es de tipo referencia y puede ser null, pero al poner el ! le decimos al compilador que no va a ser null

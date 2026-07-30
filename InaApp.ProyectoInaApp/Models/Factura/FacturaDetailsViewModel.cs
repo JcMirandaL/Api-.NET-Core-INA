@@ -12,6 +12,11 @@
 
         public int Descuento { get; set; }
 
+        //totales calculados
+        public decimal TotalImpuestos { get; set; }    
+
+        public decimal DescuentoTotal { get; set; }    
+
         public decimal Total { get; set; }
 
         public bool Estado { get; set; }

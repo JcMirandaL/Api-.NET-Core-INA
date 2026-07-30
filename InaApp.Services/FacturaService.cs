@@ -51,17 +51,26 @@ namespace InaApp.Services
             //paso de entity a DTO mapoeado a la lista
             var facturaDTO = _mapper.Map<FacturaResponseDTO>(factura);
 
-            // Calcular el subtotal de cada linea de detalle
+            // Calcular los campos calculados de cada linea de detalle
             foreach (var f in facturaDTO.Detalles)
             {
                 f.Subtotal = f.Cantidad * f.Precio;
+                f.MontoImpuesto = (f.Subtotal * f.PorcentajeImpuesto) / 100m;
+                f.DescuentoMonto = (f.Subtotal * f.DescuentoAplicado) / 100m;
+                f.TotalLinea = (f.Subtotal + f.MontoImpuesto) - f.DescuentoMonto;
             }
 
             // Calcular subtotal general de la factura sumando los subtotales de cada detalle
             facturaDTO.Subtotal = facturaDTO.Detalles.Sum(x => x.Subtotal);
 
-            // Calcular total
-            facturaDTO.Total = facturaDTO.Subtotal - (facturaDTO.Subtotal * facturaDTO.descuento / 100);
+            // Calcular total de impuestos sumando el impuesto de cada linea
+            facturaDTO.TotalImpuestos = facturaDTO.Detalles.Sum(x => x.MontoImpuesto);
+
+            // Calcular descuento total sumando el descuento de cada linea
+            facturaDTO.DescuentoTotal = facturaDTO.Detalles.Sum(x => x.DescuentoMonto);
+
+            // Calcular total final: subtotal + impuestos - descuento
+            facturaDTO.Total = facturaDTO.Subtotal + facturaDTO.TotalImpuestos - facturaDTO.DescuentoTotal;
 
             return new Response<FacturaResponseDTO>
             {
@@ -86,7 +95,9 @@ namespace InaApp.Services
             foreach (var factura in listaFacturasDTO)
             {
                 factura.Subtotal = factura.Detalles.Sum(d => d.Cantidad * d.Precio);
-                factura.Total = factura.Subtotal - (factura.Subtotal * factura.descuento / 100);
+                factura.TotalImpuestos = factura.Detalles.Sum(d => d.Cantidad * d.Precio * d.PorcentajeImpuesto / 100m);
+                factura.DescuentoTotal = factura.Detalles.Sum(d => d.Cantidad * d.Precio * d.DescuentoAplicado / 100m);
+                factura.Total = (factura.Subtotal + factura.TotalImpuestos) - factura.DescuentoTotal;
             }
 
             return new Response<List<FacturaResponseDTO>>
@@ -118,6 +129,11 @@ namespace InaApp.Services
             //limpio los detalles xq se van a llenar en el foreach y asi no se duplican los detalles de la factura al crearla
             nuevaFactura.Detalles.Clear();
 
+            //variables para acumular los totales de la factura
+            decimal subtotalGeneral = 0;
+            decimal totalImpuestos = 0;
+            decimal totalDescuento = 0;
+
             //inicializo la lista de detalles de la factura
             foreach (var detalle in entity.Detalles)
             {
@@ -134,12 +150,29 @@ namespace InaApp.Services
                     throw new InsufficientStockException($"No hay suficiente stock del producto {productoExist.Nombre}. Stock disponible: {productoExist.Stock}, Cantidad solicitada: {detalle.Cantidad}.");
                 }
 
+                //aplico cap: si el descuento ingresado supera el maximo del producto, se usa el maximo
+                int descuentoFinal = detalle.DescuentoAplicado;
+                if (descuentoFinal > productoExist.DescuentoMaximo)
+                {
+                    descuentoFinal = productoExist.DescuentoMaximo;
+                }
+
+                //calculo valores de la linea para ir acumulando los totales
+                decimal subt = detalle.Cantidad * productoExist.Precio;
+                subtotalGeneral += subt;
+                totalImpuestos += (subt * productoExist.PorcentajeImpuesto) / 100m;
+                totalDescuento += (subt * descuentoFinal) / 100m;
+
                 //creo el detalle de la factura 
                 var detalleFactura = new DetalleFactura
                 {
                     ProductoId = detalle.ProductoId,
                     Cantidad = detalle.Cantidad,
-                    Precio = productoExist.Precio
+                    Precio = productoExist.Precio,
+                    //guardo el descuento aplicado (ya con el cap aplicado)
+                    DescuentoAplicado = descuentoFinal,
+                    //asigno el producto navegable para que el mapper pueda acceder a PorcentajeImpuesto
+                    Producto = productoExist
                 };
 
 
@@ -151,18 +184,8 @@ namespace InaApp.Services
             }
 
 
-            //campos calculados solo eicsten en el dto
-            var subtotal = nuevaFactura.Detalles.Sum(d => d.Cantidad * d.Precio);
-            if (entity.descuento > subtotal)
-            {
-                throw new DiscountOutRange("El descuento no puede superar el Subtotal.");
-            }
-
-            var total = subtotal - (subtotal * nuevaFactura.descuento / 100);
-            if (total < 0)
-            {
-                throw new TotalOutRange("El total no puede ser negativo.");
-            }
+            //el descuento global se asigna a 0 (las nuevas facturas usan descuento por linea)
+            nuevaFactura.descuento = 0;
 
             //crea la factura, sus detalles y actua productos un  solo saveChanges maneja transaccion internamente
             await _facturaRepository.CrearAsync(nuevaFactura);
@@ -172,13 +195,18 @@ namespace InaApp.Services
             nuevaFactura.Cliente = clienteExist;
             //Paso de entity a DTO para la respuesta
             var responseDTO = _mapper.Map<FacturaResponseDTO>(nuevaFactura);
-            responseDTO.Subtotal = subtotal;
-            responseDTO.Total = total;
+            responseDTO.Subtotal = subtotalGeneral;
+            responseDTO.TotalImpuestos = totalImpuestos;
+            responseDTO.DescuentoTotal = totalDescuento;
+            responseDTO.Total = subtotalGeneral + totalImpuestos - totalDescuento;
 
-            //actualizo el subtotal de cada detalle de la factura en el DTO de respuesta
+            //actualizo los campos calculados de cada detalle de la factura en el DTO de respuesta
             foreach (var detalle in responseDTO.Detalles)
             {
                 detalle.Subtotal = detalle.Cantidad * detalle.Precio;
+                detalle.MontoImpuesto = (detalle.Subtotal * detalle.PorcentajeImpuesto) / 100m;
+                detalle.DescuentoMonto = (detalle.Subtotal * detalle.DescuentoAplicado) / 100m;
+                detalle.TotalLinea = (detalle.Subtotal + detalle.MontoImpuesto) - detalle.DescuentoMonto;
             }
 
             return new Response<FacturaResponseDTO>

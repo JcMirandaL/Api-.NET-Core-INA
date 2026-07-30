@@ -20,6 +20,11 @@ namespace InaApp.DTOs.FacturaDTOs
 
         public int descuento { get; set; }
 
+        //totales calculados desde las líneas de detalle
+        public decimal TotalImpuestos { get; set; }  
+
+        public decimal DescuentoTotal { get; set; }  
+
         public decimal Total { get; set; }
 
         public bool Estado { get; set; }

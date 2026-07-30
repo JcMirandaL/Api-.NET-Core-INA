@@ -66,5 +66,21 @@ namespace InaApp.Repository
                 .SingleOrDefaultAsync();
 
         }
+
+        public async Task<List<Cliente>> BuscarAsync(string? termino, int limite)
+        {
+            return await _context.Clientes
+                .AsNoTracking()
+                .Where(x => x.Estado == true &&
+                //si el termino es nulo o vacio, se devuelve todos los clientes, de lo contrario se filtra por nombre, apellido1, apellido2 o cedula
+                    (string.IsNullOrWhiteSpace(termino) ||
+                     x.Nombre.Contains(termino) ||
+                     x.Apellido1.Contains(termino) ||
+                     (x.Apellido2 != null && x.Apellido2.Contains(termino)) ||
+                     x.Cedula.Contains(termino)))
+                .OrderBy(x => x.Nombre)
+                .Take(limite)
+                .ToListAsync();
+        }
     }
 }

@@ -27,9 +27,10 @@
             <p><strong>Id:</strong> @Model.Id</p>
             <p><strong>ClienteNombre:</strong> @Model.ClienteNombre</p>
             <p><strong>Fecha:</strong> @Model.Fecha</p>
-            <p><strong>Subtotal:</strong> @Model.Subtotal</p>
-            <p><strong>Descuento:</strong> @Model.descuento</p>
-            <p><strong>Total:</strong> @Model.Total</p>
+            <p><strong>Subtotal:</strong> ₡@Model.Subtotal</p>
+            <p><strong>Descuento:</strong> ₡@Model.DescuentoTotal</p>
+            <p><strong>Descuento:</strong> ₡@Model.TotalImpuestos</p>
+            <p><strong>Total:</strong> ₡@Model.Total</p>
             <p><strong>Estado:</strong> @(Model.Estado ? "☑ Registrada" : "❌ Factura Anulada")</p>
         </div>
     </div>

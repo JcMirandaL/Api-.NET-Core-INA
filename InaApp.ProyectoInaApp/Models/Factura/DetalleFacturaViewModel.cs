@@ -10,7 +10,18 @@
 
         public int Cantidad { get; set; }
 
-        public decimal Subtotal { get; set; }
+        //campos calculados
+        public decimal Subtotal { get; set; }//Cantidad * Precio
+
+        public decimal PorcentajeImpuesto { get; set; }//del producto
+        
+        public decimal MontoImpuesto { get; set; }//Subtotal * PorcentajeImpuesto / 100
+
+        public int DescuentoAplicado { get; set; }  
+        
+        public decimal DescuentoMonto { get; set; } //Subtotal * DescuentoAplicado / 100
+        
+        public decimal TotalLinea { get; set; }                  // Subtotal + MontoImpuesto - DescuentoMonto
     }
 }
  

@@ -54,9 +54,14 @@
 
                     <tr>
                         <th>Producto</th>
-                        <th class="text-center">Cantidad</th>
-                        <th class="text-end">Precio</th>
+                        <th class="text-center">Cant.</th>
+                        <th class="text-end">Precio U.</th>
                         <th class="text-end">Subtotal</th>
+                        <th class="text-center">%Desc.</th>
+                        <th class="text-end">Monto Desc.</th>
+                        <th class="text-center">%Imp.</th>
+                        <th class="text-end">Monto Imp.</th>
+                        <th class="text-end">Total Línea</th>
                     </tr>
                 </thead>
 
@@ -65,15 +70,14 @@
                     {
                         <tr>
                             <td>@item.ProductoNombre</td>
-                            <td class="text-center">
-                                @item.Cantidad
-                            </td>
-                            <td class="text-end">
-                                ₡@item.Precio.ToString("N2")
-                            </td>
-                            <td class="text-end">
-                                ₡@item.Subtotal.ToString("N2")
-                            </td>
+                            <td class="text-center">@item.Cantidad</td>
+                            <td class="text-end">₡@item.Precio.ToString("N2")</td>
+                            <td class="text-end">₡@item.Subtotal.ToString("N2")</td>
+                            <td class="text-center">@item.DescuentoAplicado%</td>
+                            <td class="text-end">₡@item.DescuentoMonto.ToString("N2")</td>
+                            <td class="text-center">@item.PorcentajeImpuesto.ToString("N1")%</td>
+                            <td class="text-end">₡@item.MontoImpuesto.ToString("N2")</td>
+                            <td class="text-end"><strong>₡@item.TotalLinea.ToString("N2")</strong></td>
                         </tr>
                     }
                 </tbody>
@@ -95,26 +99,25 @@
                 <div class="col-md-4 offset-md-8">
 
                     <table class="table table-borderless">
-                        
+
                         <tr>
                             <th>Subtotal:</th>
-                            <td class="text-end">
-                                ₡@Model.Subtotal.ToString("N2")
-                            </td>
+                            <td class="text-end">₡@Model.Subtotal.ToString("N2")</td>
                         </tr>
 
                         <tr>
-                            <th>Descuento:</th>
-                            <td class="text-end">
-                                @Model.Descuento%
-                            </td>
+                            <th>Total Impuestos:</th>
+                            <td class="text-end">₡@Model.TotalImpuestos.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <th>Descuento Total:</th>
+                            <td class="text-end">−₡@Model.DescuentoTotal.ToString("N2")</td>
                         </tr>
 
                         <tr class="table-success">
                             <th>Total:</th>
-                            <th class="text-end">
-                                ₡@Model.Total.ToString("N2")
-                            </th>
+                            <th class="text-end">₡@Model.Total.ToString("N2")</th>
                         </tr>
 
                     </table>

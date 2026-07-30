@@ -95,5 +95,19 @@ namespace InaApp.Repository
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<List<Producto>> BuscarAsync(string? termino, int limite)
+        {
+            return await _context.Productos
+                .Include(x => x.Categoria)
+                .AsNoTracking()
+                .Where(x => x.Estado == true &&
+                //si el termino es nulo o vacio, traigo todos los productos, sino filtro por el nombre del producto
+                    (string.IsNullOrWhiteSpace(termino) ||
+                     x.Nombre.Contains(termino)))
+                .OrderBy(x => x.Nombre)
+                .Take(limite)
+                .ToListAsync();
+        }
+
     }
 }

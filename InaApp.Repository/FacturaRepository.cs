@@ -28,7 +28,7 @@ namespace InaApp.Repository
                 .Include(x => x.Detalles)
                 .ThenInclude(x => x.Producto)//el then include es para traer lkos datos de producto desde detalles
                 .AsNoTracking()
-                .Where(x => x.Id == id)
+                .Where(x => x.Id == id && x.Estado)
                 .SingleOrDefaultAsync();
         }
 
@@ -40,6 +40,7 @@ namespace InaApp.Repository
                 .Include(x => x.Detalles)
                 .ThenInclude(x => x.Producto)//el then include es para traer lkos datos de producto desde detalles
                 .AsNoTracking()
+                .Where(x => x.Estado)
                 .ToListAsync();
         }
 

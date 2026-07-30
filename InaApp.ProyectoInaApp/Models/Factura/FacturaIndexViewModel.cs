@@ -11,7 +11,9 @@ namespace InaApp.ProyectoInaApp.Models.Factura
 
         public decimal Subtotal { get; set; }
 
-        public int descuento { get; set; }
+        public decimal TotalImpuestos { get; set; }
+
+        public decimal DescuentoTotal { get; set; }
 
         public decimal Total { get; set; }
 

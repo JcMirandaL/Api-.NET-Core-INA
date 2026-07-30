@@ -34,7 +34,10 @@ namespace InaApp.Services.Mapping
             CreateMap<Cliente, ClienteResponseDTO>();
             CreateMap<Categoria, CategoriaResponseDTO>();
             CreateMap<Factura, FacturaResponseDTO>();
-            CreateMap<DetalleFactura, DetalleFacturaResponseDTO>();
+            CreateMap<DetalleFactura, DetalleFacturaResponseDTO>()
+                //mapeo el porcentaje de impuesto desde la navegacion Producto xq no existe en DetalleFactura
+                .ForMember(dest => dest.PorcentajeImpuesto,
+                           opt => opt.MapFrom(src => src.Producto.PorcentajeImpuesto));
                
 
         }

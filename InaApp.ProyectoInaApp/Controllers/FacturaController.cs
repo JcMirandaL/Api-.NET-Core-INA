@@ -5,23 +5,23 @@ using InaApp.DTOs.ClienteDTOs;
 using InaApp.DTOs.FacturaDTOs;
 using InaApp.DTOs.Producto;
 using InaApp.ProyectoInaApp.Models.Factura;
+using InaApp.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InaApp.ProyectoInaApp.Controllers
 {
     public class FacturaController : Controller
     {
         private readonly IGenericService<FacturaResponseDTO, FacturaCreateDTO, FacturaUpdateDTO> _facturaService;
-        private readonly IGenericService<ClienteResponseDTO, ClienteCreateDTO, ClienteUpdateDTO> _clienteService;
-        private readonly IGenericService<ProductoResponseDTO, ProductoCreateDTO, ProductoUpdateDTO> _productoService;
+        private readonly ClienteService _clienteService;
+        private readonly ProductoService _productoService;
         private readonly IMapper _mapper;
 
 
         public FacturaController(
             IGenericService<FacturaResponseDTO, FacturaCreateDTO, FacturaUpdateDTO> facturaService,
-            IGenericService<ClienteResponseDTO, ClienteCreateDTO, ClienteUpdateDTO> clienteService,
-            IGenericService<ProductoResponseDTO, ProductoCreateDTO, ProductoUpdateDTO> productoService,
+            ClienteService clienteService,
+            ProductoService productoService,
             IMapper mapper
         )
         {
@@ -47,7 +47,6 @@ namespace InaApp.ProyectoInaApp.Controllers
             }
             catch (NotFoundDbException ex)
             {
-                //Se usa TempData porque es un GET redirige a Index. ModelState se pierde en redirect xq solo vive en la peticion actual.
                 TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction(nameof(Index));
             }
@@ -70,15 +69,13 @@ namespace InaApp.ProyectoInaApp.Controllers
 
                 return View(facturaViewModel);
             }
-            catch (NotNumberPositiveException ex)//exeption personalizada q se lanza desde el servicio si el id es negativo.
+            catch (NotNumberPositiveException ex)
             {
-                //Se usa TempData porque es un GET redirige a Index. ModelState se pierde en redirect.
                 TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction(nameof(Index));
             }
-            catch (NotFoundDbException ex)//exeption personalizada q se lanza desde el servicio
+            catch (NotFoundDbException ex)
             {
-                //Se usa TempData porque es un GET redirige a Index. ModelState se pierde en redirect.
                 TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction(nameof(Index));
             }
@@ -91,17 +88,10 @@ namespace InaApp.ProyectoInaApp.Controllers
 
         // GET: FacturaController/Create
         [HttpGet]
-        public async Task<ActionResult> CreateAsync()
+        public ActionResult CreateAsync()
         {
-            //Creo un nuevo objeto FacturaCreateViewModel para pasarlo a la vista
             var model = new FacturaCreateViewModel();
-
-            //Llamo método CargarSelectListAsync para llenar propiedades Clientes y Productos(selectList)
-            await CargarSelectListAsync(model);
-
-            //Paso el modelo a la vista
             return View(model);
-
         }
 
         // POST: FacturaController/Create
@@ -113,7 +103,7 @@ namespace InaApp.ProyectoInaApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    await CargarSelectListAsync(facturaVM);
+                    await CargarNombresAsync(facturaVM);
                     return View(facturaVM);
                 }
 
@@ -122,10 +112,9 @@ namespace InaApp.ProyectoInaApp.Controllers
 
                 var response = await _facturaService.CrearAsync(facturaDTO);
 
-                //si el servicio devuelve un error, agrego un mensaje de error al ModelState y devuelvo la vista con los datos ingresados para que el usuario pueda corregirlos
                 if (!response.Success)
                 {
-                    await CargarSelectListAsync(facturaVM);
+                    await CargarNombresAsync(facturaVM);
 
                     ModelState.AddModelError(string.Empty, response.Message);
                     return View(facturaVM);
@@ -137,25 +126,13 @@ namespace InaApp.ProyectoInaApp.Controllers
             catch (NotFoundDbException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-                await CargarSelectListAsync(facturaVM);
+                await CargarNombresAsync(facturaVM);
                 return View(facturaVM);
             }
             catch (InsufficientStockException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-                await CargarSelectListAsync(facturaVM);
-                return View(facturaVM);
-            }
-            catch (DiscountOutRange ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                await CargarSelectListAsync(facturaVM);
-                return View(facturaVM);
-            }
-            catch (TotalOutRange ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                await CargarSelectListAsync(facturaVM);
+                await CargarNombresAsync(facturaVM);
                 return View(facturaVM);
             }
             catch (Exception)
@@ -178,19 +155,17 @@ namespace InaApp.ProyectoInaApp.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                //paso de ResponseDTO a ViewModel para poder mostrarlo en la vista y el
-                //Data es xq los datos vienen encapsulados en un objeto de tipo ResponseDTO,
                 var facturaDeleteVM = _mapper.Map<FacturaIndexViewModel>(response.Data);
 
                 return View(facturaDeleteVM);
 
             }
-            catch (NotNumberPositiveException ex)//exeption personalizada q se lanza desde el servicio si el id es negativo.
+            catch (NotNumberPositiveException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction(nameof(Index));
             }
-            catch (NotFoundDbException ex)//exeption personalizada q se lanza desde el servicio
+            catch (NotFoundDbException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction(nameof(Index));
@@ -209,29 +184,24 @@ namespace InaApp.ProyectoInaApp.Controllers
         {
             try
             {
-                //llamo service eliminar y le paso el id del a eliminar
                 var response = await _facturaService.EliminarAsync(id);
 
-                //si el servicio devuelve un error, agrego un mensaje de error al TempData
-                //y redirijo a la vista Index para que se muestre la lista de facturas
                 if (!response.Success)
                 {
                     TempData["ErrorMessage"] = response.Message;
                     return RedirectToAction(nameof(Index));
                 }
 
-                //si todo sale bien, guardo un mensaje de éxito en TempData
-                //cuando hay otra peticion se pierde el mensaje
                 TempData["SuccessMessage"] = "Producto eliminado exitosamente.";
 
                 return RedirectToAction(nameof(Index));
             }
-            catch (NotNumberPositiveException ex)//exeption personalizada q se lanza desde el servicio si el id es negativo.
+            catch (NotNumberPositiveException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction(nameof(Index));
             }
-            catch (NotFoundDbException ex)//exeption personalizada q se lanza desde el servicio
+            catch (NotFoundDbException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction(nameof(Index));
@@ -244,19 +214,34 @@ namespace InaApp.ProyectoInaApp.Controllers
         }
 
 
-
-
-        private async Task CargarSelectListAsync(FacturaCreateViewModel vModel)
+        [HttpGet]
+        public async Task<IActionResult> BuscarClientes(string? termino)
         {
-            //obtengo todos los clientes
-            var clientes = await _clienteService.ObtenerTodosAsync();
-            //asigno a la propiedad Clientes del ViewModel una nueva SelectList con los datos obtenidos de clientes.Data
-            vModel.Clientes = new SelectList(clientes.Data, "Id", "Nombre");
+            var response = await _clienteService.BuscarAsync(termino);
 
-            //obtengo todos los productos
-            var productos = await _productoService.ObtenerTodosAsync();
-            //asigno a la propiedad Productos del ViewModel una nueva SelectList con los datos obtenidos de productos.Data
-            vModel.Productos = new SelectList(productos.Data, "Id", "Nombre");
+            var viewModel = new BusquedaClienteModalViewModel
+            {
+                //aqui le digo que si la respuesta es nula, le asigne una lista vacía para evitar errores en la vista
+                Items = response.Data ?? new List<ClienteResponseDTO>(),
+                //si el termino es nulo, le asigno una cadena vacía para evitar errores en la vista
+                Termino = termino ?? ""
+            };
+
+            return PartialView("_ResultadoBusquedaClientes", viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BuscarProductos(string? termino)
+        {
+            var response = await _productoService.BuscarAsync(termino);
+
+            var viewModel = new BusquedaProductoModalViewModel
+            {
+                Items = response.Data ?? new List<ProductoResponseDTO>(),
+                Termino = termino ?? ""
+            };
+
+            return PartialView("_ResultadoBusquedaProductos", viewModel);
         }
 
 
@@ -265,8 +250,7 @@ namespace InaApp.ProyectoInaApp.Controllers
         {
             try
             {
-                //volver a cargar los combos
-                await CargarSelectListAsync(model);
+                await CargarNombresAsync(model);
 
                 if (model.ProductoId <= 0)
                 {
@@ -288,15 +272,29 @@ namespace InaApp.ProyectoInaApp.Controllers
                     return View("Create", model);
                 }
 
+                //aplico cap: si el descuento ingresado supera el maximo del producto, se usa el maximo
+                int descuentoFinal = model.DescuentoAplicado;
+                if (descuentoFinal > producto.Data.DescuentoMaximo)
+                    descuentoFinal = producto.Data.DescuentoMaximo;
+
+                //calculo valores de la linea
+                decimal subt = model.Cantidad * producto.Data.Precio;
+                decimal impuesto = subt * producto.Data.PorcentajeImpuesto / 100m;
+                decimal descMonto = subt * descuentoFinal / 100m;
+                decimal totalLinea = subt + impuesto - descMonto;
+
                 // Verificar si el producto ya existe en la factura
                 var detalleExistente = model.Detalles
                     .FirstOrDefault(x => x.ProductoId == model.ProductoId);
 
                 if (detalleExistente != null)
                 {
-                    // Solo aumenta la cantidad
+                    // Solo aumenta la cantidad y recalcula todo
                     detalleExistente.Cantidad += model.Cantidad;
                     detalleExistente.Subtotal = detalleExistente.Cantidad * detalleExistente.Precio;
+                    detalleExistente.MontoImpuesto = detalleExistente.Subtotal * detalleExistente.PorcentajeImpuesto / 100m;
+                    detalleExistente.DescuentoMonto = detalleExistente.Subtotal * detalleExistente.DescuentoAplicado / 100m;
+                    detalleExistente.TotalLinea = detalleExistente.Subtotal + detalleExistente.MontoImpuesto - detalleExistente.DescuentoMonto;
                 }
                 else
                 {
@@ -307,46 +305,50 @@ namespace InaApp.ProyectoInaApp.Controllers
                         ProductoNombre = producto.Data.Nombre,
                         Precio = producto.Data.Precio,
                         Cantidad = model.Cantidad,
-                        Subtotal = model.Cantidad * producto.Data.Precio
+                        Subtotal = subt,
+                        PorcentajeImpuesto = producto.Data.PorcentajeImpuesto,
+                        MontoImpuesto = impuesto,
+                        DescuentoAplicado = descuentoFinal,
+                        DescuentoMonto = descMonto,
+                        TotalLinea = totalLinea
                     };
 
                     //agregar a la lista
                     model.Detalles.Add(detalle);
                 }
 
-                //recalcular subtotal
-                model.Subtotal = model.Detalles.Sum(x => x.Subtotal);
-
-                //recalcular total
-                model.Total = model.Subtotal - (model.Subtotal * model.Descuento / 100);
+                //recalcular todos los totales de la factura
+                RecalcularTotales(model);
 
                 //Limpiar ModelState para que la vista refleje los nuevos valores.
-                //En ASP.NET Core, ModelState tiene prioridad sobre el modelo.
-                //Sin esto, el select y el input no se limpian porque ModelState conserva el valor del POST anterior.
                 ModelState.Remove("ProductoId");
                 ModelState.Remove("Cantidad");
+                ModelState.Remove("ProductoNombre");
+                ModelState.Remove("DescuentoAplicado");
 
-                //retorno a la vista Create con el modelo actualizado
+                model.ProductoId = 0;
+                model.Cantidad = 0;
+                model.ProductoNombre = "";
+                model.DescuentoAplicado = 0;
+
                 return View("Create", model);
             }
             catch (NotNumberPositiveException ex)
             {
-                //Se usa ModelState porque el error ocurre en un form POST.
-                //El usuario necesita ver el error EN el form para corregirlo y reintentar.
                 ModelState.AddModelError(string.Empty, ex.Message);
-                await CargarSelectListAsync(model);
+                await CargarNombresAsync(model);
                 return View("Create", model);
             }
             catch (NotFoundDbException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-                await CargarSelectListAsync(model);
+                await CargarNombresAsync(model);
                 return View("Create", model);
             }
             catch (Exception)
             {
                 TempData["ErrorMessage"] = "Error interno del servidor. Contacte con el administrador.";
-                await CargarSelectListAsync(model);
+                await CargarNombresAsync(model);
                 return View("Create", model);
             }
         }
@@ -357,7 +359,7 @@ namespace InaApp.ProyectoInaApp.Controllers
         {
             try
             {
-                await CargarSelectListAsync(model);
+                await CargarNombresAsync(model);
             }
             catch (Exception)
             {
@@ -374,24 +376,60 @@ namespace InaApp.ProyectoInaApp.Controllers
             }
 
 
-            model.Subtotal = model.Detalles.Sum(x => x.Subtotal);
+            RecalcularTotales(model);
 
-            model.Total = model.Subtotal - (model.Subtotal * model.Descuento / 100);
-
-            //Limpiar ModelState para que la vista refleje los nuevos valores.
-            //En ASP.NET Core, ModelState tiene prioridad sobre el modelo.
-            //Sin esto, el select y el input no se limpian porque ModelState conserva el valor del POST anterior.
             ModelState.Remove("ProductoId");
             ModelState.Remove("Cantidad");
+            ModelState.Remove("ProductoNombre");
+            ModelState.Remove("DescuentoAplicado");
 
-            //retorno a la vista Create con el modelo actualizado
+            model.ProductoId = 0;
+            model.Cantidad = 0;
+            model.ProductoNombre = "";
+            model.DescuentoAplicado = 0;
+
             return View("Create", model);
         }
 
 
+        //recalcula todos los totales de la factura desde los detalles
+        private void RecalcularTotales(FacturaCreateViewModel model)
+        {
+            model.Subtotal = model.Detalles.Sum(x => x.Subtotal);
+            model.TotalImpuestos = model.Detalles.Sum(x => x.MontoImpuesto);
+            model.DescuentoTotal = model.Detalles.Sum(x => x.DescuentoMonto);
+            model.Total = model.Subtotal + model.TotalImpuestos - model.DescuentoTotal;
+        }
 
+        private async Task CargarNombresAsync(FacturaCreateViewModel vModel)
+        {
+            if (vModel.ClienteId > 0)
+            {
+                try
+                {
+                    var cliente = await _clienteService.ObtenerPorIdAsync(vModel.ClienteId);
+                    if (cliente.Success && cliente.Data != null)
+                    {
+                        vModel.ClienteNombre =
+                            $"{cliente.Data.Nombre} {cliente.Data.Apellido1} {cliente.Data.Apellido2}".Trim();
+                    }
+                }
+                catch { }
+            }
 
-
+            if (vModel.ProductoId > 0)
+            {
+                try
+                {
+                    var producto = await _productoService.ObtenerPorIdAsync(vModel.ProductoId);
+                    if (producto.Success && producto.Data != null)
+                    {
+                        vModel.ProductoNombre = producto.Data.Nombre;
+                    }
+                }
+                catch { }
+            }
+        }
 
 
         // GET: FacturaController/Edit/5

@@ -1,0 +1,50 @@
+@using InaApp.ProyectoInaApp.Models.Factura
+
+
+@model BusquedaProductoModalViewModel
+@{
+    ViewData["Title"] = "Seleccionar Producto";
+}
+
+@if (Model.Items.Count == 0)
+{
+    <p class="text-muted text-center my-3">No se encontraron productos.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-sm">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Stock</th>
+                    <th>Precio</th>
+                    <th>Descuento Máximo</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Nombre</td>
+                        <td>@item.Stock</td>
+                        <td>₡@item.Precio.ToString("N2")</td>
+                        <td>@item.DescuentoMaximo%</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-primary btn-sm btn-seleccionar-producto"
+                                    data-id="@item.Id"
+                                    data-nombre="@item.Nombre"
+                                    data-descuento-maximo="@item.DescuentoMaximo">
+                                Seleccionar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

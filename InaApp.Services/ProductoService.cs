@@ -300,6 +300,18 @@ namespace InaApp.Services
 
 
 
+        public async Task<Response<List<ProductoResponseDTO>>> BuscarAsync(string? termino, int limite = 30)
+        {
+            var productos = await _productoRepository.BuscarAsync(termino, limite);
+
+            return new Response<List<ProductoResponseDTO>>
+            {
+                Message = "Búsqueda completada.",
+                Data = _mapper.Map<List<ProductoResponseDTO>>(productos),
+                Success = true
+            };
+        }
+
         public async Task<Response<bool>> EliminarAsync(int id)
         {
             if (id <= 0)

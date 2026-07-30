@@ -15,6 +15,12 @@ namespace InaApp.DTOs.DetalleFacturaDTOs
 
         public decimal Precio { get; set; }
 
-        public decimal Subtotal { get; set; }
+        //campos calculados (no se persisten, se obtienen del producto o se calculan)
+        public decimal Subtotal { get; set; } //Cantidad * Precio
+        public decimal PorcentajeImpuesto { get; set; }          
+        public decimal MontoImpuesto { get; set; }//Subtotal * PorcentajeImpuesto / 100
+        public int DescuentoAplicado { get; set; }
+        public decimal DescuentoMonto { get; set; }//Subtotal * DescuentoAplicado / 100
+        public decimal TotalLinea { get; set; }//Subtotal + MontoImpuesto - DescuentoMonto
     }
 }

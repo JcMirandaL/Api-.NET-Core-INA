@@ -28,7 +28,8 @@
                 <th>Nombre Cliente</th>
                 <th>Fecha</th>
                 <th>Subtotal</th>
-                <th>Descuento</th>
+                <th>Total Desc.</th>
+                <th>Total Imp.</th>
                 <th>Total</th>
                 <th>Estado</th>
                 <th class="text-center">Acciones</th>
@@ -45,7 +46,8 @@
                         <td>@factura.ClienteNombre</td>
                         <td>@factura.Fecha</td>
                         <td>₡@factura.Subtotal.ToString("N2")</td>
-                        <td>@factura.descuento%</td>
+                        <td>₡@factura.DescuentoTotal</td>
+                        <td>₡@factura.TotalImpuestos</td>
                         <td>₡@factura.Total.ToString("N2")</td>
                         <td>@(factura.Estado ? "☑ Registrada" : "❌ Factura Anulada")</td>
                         <td class="text-center">

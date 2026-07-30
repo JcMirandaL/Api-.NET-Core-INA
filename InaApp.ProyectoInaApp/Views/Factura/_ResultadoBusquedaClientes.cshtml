@@ -1,0 +1,51 @@
+@using InaApp.ProyectoInaApp.Models.Factura
+
+
+@model BusquedaClienteModalViewModel
+@{
+    ViewData["Title"] = "Seleccionar Cliente";
+}
+
+@if (Model.Items.Count == 0)
+{
+    <p class="text-muted text-center my-3">No se encontraron clientes.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-sm">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Cédula</th>
+                    <th>Nombre</th>
+                    <th>Primer Apellido</th>
+                    <th>Segundo Apellido</th>
+                    <th>Correo</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Cedula</td>
+                        <td>@item.Nombre</td>
+                        <td>@item.Apellido1</td>
+                        <td>@item.Apellido2</td>
+                        <td>@item.Correo</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-primary btn-sm btn-seleccionar-cliente"
+                                    data-id="@item.Id"
+                                    data-nombre="@($"{item.Nombre} {item.Apellido1} {item.Apellido2}".Trim())">
+                                Seleccionar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

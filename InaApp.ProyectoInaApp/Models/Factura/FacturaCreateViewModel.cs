@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.ProyectoInaApp.Models.Factura
 {
@@ -33,7 +34,12 @@ namespace InaApp.ProyectoInaApp.Models.Factura
         
         public decimal DescuentoTotal { get; set; }        
         
-        public decimal Total { get; set; }                 
+        public decimal Total { get; set; }
+
+
+        public TipoDocumentoEnum TipoDocumento { get; set; } = TipoDocumentoEnum.FacturaElectronica;
+        public int? FacturaReferenciaId { get; set; }
+        public string? MotivoNotaCredito { get; set; }
 
     }
 }

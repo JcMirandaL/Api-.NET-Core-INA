@@ -60,6 +60,12 @@ namespace InaApp.Data
                 .WithMany(c => c.Facturas)//1 cliente tiene muchass facturas
                 .HasForeignKey(f => f.ClienteId);//FK
 
+            //fk propia para saber cual factura es la original para NotaCredito
+            modelBuilder.Entity<Factura>()
+                .HasOne(f => f.FacturaReferencia)
+                .WithMany()//una factura puede tener muchas facturas de referencia, pero no necesito navegar hacia ellas
+                .HasForeignKey(f => f.FacturaReferenciaId)
+                .OnDelete(DeleteBehavior.NoAction);//evitar borrado en cascada
 
             //-------------------DETALLES FACTURA/PRODUCTO Y FACTURTA-----------------------------//
             //PK COMPUESTA

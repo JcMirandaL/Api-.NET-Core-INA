@@ -61,22 +61,15 @@ namespace InaApp.Common.Enums
         }
 
 
-
-        public enum TipoVentaEnum
+        public enum TipoDocumentoEnum
         {
-            Contado = 1,
-            Credito = 2
-        }
+            [Display(Name = "Factura Electrónica")]
+            FacturaElectronica = 1,
 
-
-        public enum TipopPagoEnum
-        {
-            Efectivo = 1,
-            TarjetaCredito = 2,
-            TarjetaDebito = 3,
-            TransferenciaBancaria = 4,
-            Cheque = 5,
-            SinpeMovil = 6
+            [Display(Name = "Nota De Credito")]
+            NotaCredito = 2,
         }
+        
+        
     }
 }

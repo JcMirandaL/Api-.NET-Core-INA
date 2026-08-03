@@ -2,10 +2,10 @@
 using InaApp.Common.Exceptions;
 using InaApp.Common.Interfaces;
 using InaApp.Common.Response;
-using InaApp.Data;
 using InaApp.DTOs.FacturaDTOs;
 using InaApp.Entities;
 using InaApp.Repository;
+using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.Services
 {
@@ -217,6 +217,136 @@ namespace InaApp.Services
             };
        
         }
+
+
+
+        public async Task<Response<FacturaResponseDTO>> CrearNotaCreditoAsync(FacturaCreateDTO entity)
+        {
+            if (entity.Detalles == null || entity.Detalles.Count == 0)
+            {
+                throw new NotFoundDbException("La Nota de Credito debe tener almenos un detalle de Factura.");
+            }
+
+            if (!entity.FacturaReferenciaId.HasValue)
+            {
+                throw new NotFoundDbException("La Nota de Credito debe tener un Id de factura de referencia.");
+            }
+
+            if (string.IsNullOrWhiteSpace(entity.MotivoNotaCredito))
+            {
+                throw new NotFoundDbException("La Nota de Credito debe tener un motivo.");
+            }
+
+            var clienteExist = await _clienteRepository.ObtenerPorIdAsync(entity.ClienteId);
+            if (clienteExist == null)
+            {
+                throw new NotFoundDbException($"No se puede crear notas de credito con un cliente inexistente. Cliente ingresado {entity.ClienteId}.");
+            }
+
+            //.Value xq FacturaReferenciaId es nullable, pero ya se verifico que tenga valor
+            var FacturaOriginal = await _facturaRepository.ObtenerPorIdAsync(entity.FacturaReferenciaId.Value);
+            if (FacturaOriginal == null)
+            {
+                throw new NotFoundDbException($"No se puede crear notas de credito con una factura de referencia inexistente. Factura ingresada {entity.FacturaReferenciaId.Value}.");
+            }
+
+            if (FacturaOriginal.TipoDocumento != TipoDocumentoEnum.FacturaElectronica)
+            {
+                throw new NotFoundDbException($"No se puede crear notas de credito con una factura de referencia que no sea de tipo FacturaElectronica. Factura ingresada {entity.FacturaReferenciaId.Value}.");
+            }
+
+
+            Factura nuevaNotaCredito = _mapper.Map<Factura>(entity);
+            nuevaNotaCredito.Detalles.Clear();
+            nuevaNotaCredito.descuento = 0; // Descuento global en 0, ya que se usa descuento por línea
+            decimal subtotalGeneral = 0;
+            decimal totalImpuestos = 0;
+            decimal totalDescuento = 0;
+
+            foreach (var detalle in entity.Detalles)
+            {
+                var productoExist = await _productoRepository.ObtenerPorIdUpdateStockAsync(detalle.ProductoId);
+                if (productoExist == null)
+                {
+                    throw new NotFoundDbException($"No se puede crear notas de credito con un producto inexistente. Producto ingresado {detalle.ProductoId}.");
+                }
+                
+
+                var detalleOriginal = FacturaOriginal.Detalles.FirstOrDefault(d => d.ProductoId == detalle.ProductoId);
+                if (detalleOriginal == null)
+                {
+                    throw new NotFoundDbException($"El producto con Id {detalle.ProductoId} no existe en la factura de referencia.");
+                }
+
+                if (detalle.Cantidad > detalleOriginal.Cantidad)
+                {
+                    throw new InsufficientStockException($"La cantidad de devolución para el producto {productoExist.Nombre} excede la cantidad original en la factura. Cantidad original: {detalleOriginal.Cantidad}, Cantidad solicitada: {detalle.Cantidad}.");
+                }
+
+                if (detalle.Cantidad < 0)
+                {
+                    throw new NotNumberPositiveException($"La cantidad de devolución para el producto {productoExist.Nombre} no puede ser menor a cero. Cantidad ingresada: {detalle.Cantidad}.");
+                }
+
+                if (detalle.Cantidad == 0)
+                {
+                    continue;// Si la cantidad es cero, no se realiza ninguna acción para este detalle se la salta
+                }
+
+
+                decimal precioOriginal = detalleOriginal.Precio;
+
+                productoExist.Stock += detalle.Cantidad; // Devolver el stock del producto
+
+                decimal subt = detalle.Cantidad * precioOriginal;
+                subtotalGeneral += subt;
+                totalImpuestos += (subt * productoExist.PorcentajeImpuesto) / 100m;
+                int descuestoFinal = detalleOriginal.DescuentoAplicado;
+                totalDescuento += (subt * descuestoFinal) / 100;
+
+                var detalleNotaCredito = new DetalleFactura
+                {
+                    ProductoId = detalle.ProductoId,
+                    Cantidad = detalle.Cantidad,
+                    Precio = precioOriginal,
+                    DescuentoAplicado = descuestoFinal, 
+                    Producto = productoExist
+                };
+
+                nuevaNotaCredito.Detalles.Add(detalleNotaCredito);
+            }
+
+            if (nuevaNotaCredito.Detalles.Count == 0)
+            {
+                throw new NotFoundDbException ($"La nota de crédito debe tener al menos un detalle con cantidad mayor a cero.");
+            }
+
+            await _facturaRepository.CrearAsync(nuevaNotaCredito);
+
+            nuevaNotaCredito.Cliente = clienteExist;
+            var responseDTO = _mapper.Map<FacturaResponseDTO>(nuevaNotaCredito);
+            responseDTO.Subtotal = subtotalGeneral;
+            responseDTO.TotalImpuestos = totalImpuestos;
+            responseDTO.DescuentoTotal = totalDescuento;
+            responseDTO.Total = (subtotalGeneral + totalImpuestos) - totalDescuento;
+
+            foreach (var d in responseDTO.Detalles)
+            {
+                d.Subtotal = d.Cantidad * d.Precio;
+                d.MontoImpuesto = (d.Subtotal * d.PorcentajeImpuesto) / 100m;
+                d.DescuentoMonto = (d.Subtotal * d.DescuentoAplicado) / 100;
+                d.TotalLinea = (d.Subtotal + d.MontoImpuesto) - d.DescuentoMonto;
+            }
+
+            return new Response<FacturaResponseDTO>
+            {
+                Message = "Nota de Crédito creada exitosamente.",
+                Data = responseDTO,
+                Success = true
+            };
+        }
+
+
 
 
         public async Task<Response<bool>> EliminarAsync(int id)

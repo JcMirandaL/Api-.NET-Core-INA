@@ -25,6 +25,7 @@ namespace InaApp.Repository
         {
             return await _context.Factura
                 .Include(x => x.Cliente)
+                .Include(x => x.FacturaReferencia)//para traer los datos de la factura de referencia
                 .Include(x => x.Detalles)
                 .ThenInclude(x => x.Producto)//el then include es para traer lkos datos de producto desde detalles
                 .AsNoTracking()
@@ -37,6 +38,7 @@ namespace InaApp.Repository
         {
             return await _context.Factura
                 .Include(x => x.Cliente)
+                .Include(x => x.FacturaReferencia)//para traer los datos de la factura de referencia
                 .Include(x => x.Detalles)
                 .ThenInclude(x => x.Producto)//el then include es para traer lkos datos de producto desde detalles
                 .AsNoTracking()

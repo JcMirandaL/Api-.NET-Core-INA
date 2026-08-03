@@ -1,4 +1,5 @@
 ﻿@using InaApp.ProyectoInaApp.Models.Factura
+@using static InaApp.Common.Enums.Enumeradores
 
 
 <!--el import no hace falta xq ya esta en el archivo _ViewImports.cshtml
@@ -31,7 +32,8 @@
                 <th>Total Desc.</th>
                 <th>Total Imp.</th>
                 <th>Total</th>
-                <th>Estado</th>
+                <th>Tipo Factura</th>
+                <th>Factura Referencia</th>
                 <th class="text-center">Acciones</th>
             </tr>
         </thead>
@@ -49,7 +51,8 @@
                         <td>₡@factura.DescuentoTotal</td>
                         <td>₡@factura.TotalImpuestos</td>
                         <td>₡@factura.Total.ToString("N2")</td>
-                        <td>@(factura.Estado ? "☑ Registrada" : "❌ Factura Anulada")</td>
+                        <td>@Html.DisplayFor(m => factura.TipoDocumento)</td>
+                        <td>@factura.FacturaReferenciaId</td>
                         <td class="text-center">
                             <a asp-action="Details"
                                asp-route-id="@factura.Id"
@@ -57,11 +60,14 @@
                                 Detalles
                             </a>
 
-                            <a asp-action="Delete"
-                               asp-route-id="@factura.Id"
-                               class="btn btn-danger btn-sm my-1">
-                                Anular Factura
-                            </a>
+                            @if (factura.TipoDocumento == TipoDocumentoEnum.FacturaElectronica)
+                            {
+                                <a asp-action="CreditNoteCreate"
+                                   asp-route-id="@factura.Id"
+                                   class="btn btn-danger btn-sm my-1">
+                                    Crear Nota Credito
+                                </a>
+                            } 
                         </td>
                     </tr>
                 }
@@ -69,7 +75,7 @@
             else
             {
                 <tr>
-                    <td colspan="8" class="text-center">
+                    <td colspan="9" class="text-center">
                         No existen facturas registradas.
                     </td>
                 </tr>

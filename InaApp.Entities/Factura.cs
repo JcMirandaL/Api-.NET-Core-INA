@@ -2,6 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.Entities
 {
@@ -24,6 +25,14 @@ namespace InaApp.Entities
         [Range(0, int.MaxValue, ErrorMessage = "El descuento debe ser igual o mayor a 0.")]
         public int descuento { get; set; }
 
+        [Required]
+        public TipoDocumentoEnum TipoDocumento { get; set; } = TipoDocumentoEnum.FacturaElectronica;
+
+        public int? FacturaReferenciaId { get; set; }  // FK → Factura.Id
+
+        [MaxLength(500)]
+        public string? MotivoNotaCredito { get; set; }
+
         [Required(ErrorMessage = "El estado es un campo obligatorio.")]
         public bool Estado { get; set; } = true;
 
@@ -39,8 +48,10 @@ namespace InaApp.Entities
 
         //relacion un cliente muchas facturas
         public Cliente Cliente { get; set; } = null!;
+        //propiedades de navegacion
+        public Factura FacturaReferencia { get; set; } = null!;
 
-        //relacion 1 : N, 1 Factura Muchos detalles
+        //relacion 1 : N, 1 Factura Muchos detalles 
         public ICollection<DetalleFactura> Detalles { get; set; } = new List<DetalleFactura>();
 
     }

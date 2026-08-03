@@ -1,4 +1,6 @@
-﻿namespace InaApp.ProyectoInaApp.Models.Factura
+﻿using static InaApp.Common.Enums.Enumeradores;
+
+namespace InaApp.ProyectoInaApp.Models.Factura
 {
     public class FacturaDetailsViewModel
     {
@@ -22,6 +24,10 @@
         public bool Estado { get; set; }
 
         public List<DetalleFacturaViewModel> Detalles { get; set; } = new List<DetalleFacturaViewModel>();
+
+        public TipoDocumentoEnum TipoDocumento { get; set; } 
+        public int? FacturaReferenciaId { get; set; }
+        public string? MotivoNotaCredito { get; set; }
 
     }
 }

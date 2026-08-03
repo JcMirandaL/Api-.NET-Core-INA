@@ -51,6 +51,7 @@
                         <td>@producto.PorcentajeImpuesto.ToString("N1")%</td>
                         <td>@producto.DescuentoMaximo%</td>
                         <td class="text-center">
+                            <!--envia el id por la ruta del query al GET controller de edit-->
                             <a asp-action="Details"
                                asp-route-id="@producto.Id"
                                class="btn btn-info btn-sm my-1">

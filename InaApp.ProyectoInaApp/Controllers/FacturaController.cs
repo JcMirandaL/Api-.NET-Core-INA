@@ -7,19 +7,20 @@ using InaApp.DTOs.Producto;
 using InaApp.ProyectoInaApp.Models.Factura;
 using InaApp.Services;
 using Microsoft.AspNetCore.Mvc;
+using static InaApp.Common.Enums.Enumeradores;
 
 namespace InaApp.ProyectoInaApp.Controllers
 {
     public class FacturaController : Controller
     {
-        private readonly IGenericService<FacturaResponseDTO, FacturaCreateDTO, FacturaUpdateDTO> _facturaService;
+        private readonly FacturaService _facturaService;
         private readonly ClienteService _clienteService;
         private readonly ProductoService _productoService;
         private readonly IMapper _mapper;
 
 
         public FacturaController(
-            IGenericService<FacturaResponseDTO, FacturaCreateDTO, FacturaUpdateDTO> facturaService,
+            FacturaService facturaService,
             ClienteService clienteService,
             ProductoService productoService,
             IMapper mapper
@@ -141,6 +142,93 @@ namespace InaApp.ProyectoInaApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+
+
+
+        [HttpGet]
+        public async Task<ActionResult> CreditNoteCreateAsync(int id)
+        {
+            //Cargo factura original
+            var response = await _facturaService.ObtenerPorIdAsync(id);
+            if (!response.Success || response.Data == null)
+            {
+                TempData["ErrorMessage"] = "Factura no encontrada.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var original = response.Data;
+
+            // 2. Solo FE pueden tener NC
+            if (original.TipoDocumento != TipoDocumentoEnum.FacturaElectronica)
+            {
+                TempData["ErrorMessage"] = "Solo facturas electrónicas pueden tener notas de crédito.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // 3. Precargar ViewModel
+            var vm = _mapper.Map<FacturaCreateViewModel>(original);
+            vm.TipoDocumento = TipoDocumentoEnum.NotaCredito;
+            vm.FacturaReferenciaId = original.Id;
+
+            //guardo la cantidad original de cada detalle para mostrarla como referencia y usarla como max
+            foreach (var detalle in vm.Detalles)
+            {
+                detalle.CantidadOriginal = detalle.Cantidad;
+            }
+
+            return View("CreditNoteCreate", vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreditNoteCreateAsync(FacturaCreateViewModel vm)
+        {
+            try
+            {
+                vm.TipoDocumento = TipoDocumentoEnum.NotaCredito;
+
+                if (!ModelState.IsValid)
+                {
+                    await CargarNombresAsync(vm);
+                    return View("CreditNoteCreate", vm);
+                }
+
+                //paso de ViewModel a DTO para enviarlo al servicio, incluyendo la lista de detalles
+                var dto = _mapper.Map<FacturaCreateDTO>(vm);
+                var response = await _facturaService.CrearNotaCreditoAsync(dto);
+
+                if (!response.Success)
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                    await CargarNombresAsync(vm);
+                    return View("CreditNoteCreate", vm);
+                }
+
+                TempData["SuccessMessage"] = "Nota de Crédito generada exitosamente.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (NotFoundDbException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View("CreditNoteCreate", vm);
+            }
+            catch (InsufficientStockException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View("CreditNoteCreate", vm);
+            }
+            catch (NotNumberPositiveException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View("CreditNoteCreate", vm);
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Error interno del servidor.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
 
         // GET: FacturaController/Delete/5
         public async Task<ActionResult> DeleteAsync(int id)

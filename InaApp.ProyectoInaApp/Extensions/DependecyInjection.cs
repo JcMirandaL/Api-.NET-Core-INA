@@ -41,6 +41,7 @@ namespace InaApp.ProyectoInaApp.Extensions
             services.AddScoped<IGenericService<ClienteResponseDTO, ClienteCreateDTO, ClienteUpdateDTO>, ClienteService>();
             services.AddScoped<IGenericService<CategoriaResponseDTO, CategoriaCreateDTO, CategoriaUpdateDTO>, CategoriaService>();
             services.AddScoped<IGenericService<FacturaResponseDTO, FacturaCreateDTO, FacturaUpdateDTO>, FacturaService>();
+            services.AddScoped<FacturaService>();
 
 
             //inyecciones de dependencia de repository

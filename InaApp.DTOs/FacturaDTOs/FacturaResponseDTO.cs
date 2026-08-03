@@ -1,4 +1,5 @@
 ﻿using InaApp.DTOs.DetalleFacturaDTOs;
+using static InaApp.Common.Enums.Enumeradores;
 
 
 namespace InaApp.DTOs.FacturaDTOs
@@ -28,6 +29,10 @@ namespace InaApp.DTOs.FacturaDTOs
         public decimal Total { get; set; }
 
         public bool Estado { get; set; }
+
+        public TipoDocumentoEnum TipoDocumento { get; set; }
+        public int? FacturaReferenciaId { get; set; }
+        public string? MotivoNotaCredito { get; set; }
 
     }
 }

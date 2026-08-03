@@ -10,6 +10,9 @@
 
         public int Cantidad { get; set; }
 
+        //cantidad original de la factura de referencia (para NC), solo display
+        public int CantidadOriginal { get; set; }
+
         //campos calculados
         public decimal Subtotal { get; set; }//Cantidad * Precio
 

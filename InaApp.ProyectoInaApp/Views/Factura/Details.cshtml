@@ -1,4 +1,5 @@
 ﻿@using InaApp.ProyectoInaApp.Models.Factura
+@using static InaApp.Common.Enums.Enumeradores
 
 @model FacturaDetailsViewModel
 
@@ -33,10 +34,31 @@
                     <strong>Fecha:</strong><br />
                     @Model.Fecha.ToString("dd/MM/yyyy")
                 </div>
+
                 <div class="col-md-2">
-                    <strong>Estado:</strong><br />
-                    @(Model.Estado ? "☑ Registrada" : "❌ Factura Anulada")
+                    <strong>Tipo Documento:</strong><br />
+                    @Html.DisplayFor(m => m.TipoDocumento)
                 </div>
+
+                @if (Model.TipoDocumento == TipoDocumentoEnum.NotaCredito && Model.FacturaReferenciaId.HasValue)
+                {
+                    <div class="col-md-3">
+                        <strong>Factura de Referencia:</strong><br />
+                        <a asp-action="Details" asp-route-id="@Model.FacturaReferenciaId.Value">
+                            #@Model.FacturaReferenciaId.Value
+                        </a>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.MotivoNotaCredito))
+                {
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <strong>Motivo Nota de Crédito:</strong><br />
+                            @Model.MotivoNotaCredito
+                        </div>
+                    </div>
+                }
 
             </div>
         </div>
